@@ -16,10 +16,11 @@ module.exports = {
           200: '#eeeeeeff',
         },
         dark: {
-          100: '#1c1c1eff',
-          200: '#121212ff',
-          300: '#0a0a0aff',
+          100: '#221f3d',
+          200: '#0f0d23',
+          
         },
+        accent: '#c8dde6ff',
       },
     },
   },
