@@ -1,110 +1,124 @@
 import React, {
   useRef,
-  useCallback,
 } from 'react';
 
 import {
-  Pressable,
   Animated,
-  type PressableProps,
-  type StyleProp,
-  type ViewStyle,
+  Pressable,
+  PressableProps,
 } from 'react-native';
 
-export type PressScaleProps = Omit<
-  PressableProps,
-  'style'
-> & {
-  style?: StyleProp<ViewStyle>;
-  /** Pressed scale (1 = no change). Default 0.97 */
-  scaleTo?: number;
-};
+type Props =
+  PressableProps & {
 
-/**
- * Subtle press feedback: spring scale down on press in, restore on release.
- * Uses native driver for performance.
- */
+    children:
+      React.ReactNode;
+
+    scaleTo?: number;
+  };
+
 export default function PressScale({
+
   children,
-  style,
+
   scaleTo = 0.97,
+
+  style:
+    incomingStyle,
+
   disabled,
+
   onPressIn,
   onPressOut,
-  ...rest
-}: PressScaleProps) {
+
+  ...props
+
+}: Props) {
 
   const scale =
-    useRef(new Animated.Value(1)).current;
+    useRef(
+      new Animated.Value(1)
+    ).current;
 
-  const handlePressIn =
-    useCallback(
-      (event: Parameters<
-        NonNullable<PressableProps['onPressIn']>
-      >[0]>) => {
+  function handlePressIn(
+    event: any
+  ) {
 
-        if (!disabled) {
-          Animated.spring(scale, {
-            toValue: scaleTo,
-            useNativeDriver: true,
-            friction: 8,
-            tension: 220,
-          }).start();
-        }
+    if (!disabled) {
 
-        onPressIn?.(event);
-      },
-      [
-        disabled,
-        onPressIn,
-        scale,
-        scaleTo,
-      ]
-    );
+      Animated.spring(scale, {
 
-  const handlePressOut =
-    useCallback(
-      (event: Parameters<
-        NonNullable<PressableProps['onPressOut']>
-      >[0]>) => {
+        toValue:
+          scaleTo,
 
-        Animated.spring(scale, {
-          toValue: 1,
-          useNativeDriver: true,
-          friction: 7,
-          tension: 220,
-        }).start();
+        useNativeDriver: true,
 
-        onPressOut?.(event);
-      },
-      [
-        onPressOut,
-        scale,
-      ]
-    );
+        speed: 30,
+
+        bounciness: 6,
+
+      }).start();
+    }
+
+    if (onPressIn) {
+      onPressIn(event);
+    }
+  }
+
+  function handlePressOut(
+    event: any
+  ) {
+
+    Animated.spring(scale, {
+
+      toValue: 1,
+
+      useNativeDriver: true,
+
+      speed: 30,
+
+      bounciness: 6,
+
+    }).start();
+
+    if (onPressOut) {
+      onPressOut(event);
+    }
+  }
 
   return (
+
     <Pressable
-      {...rest}
+      {...props}
+
       disabled={disabled}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
+
+      onPressIn={
+        handlePressIn
+      }
+
+      onPressOut={
+        handlePressOut
+      }
     >
       <Animated.View
         style={[
+
+          typeof incomingStyle ===
+          'function'
+            ? undefined
+            : incomingStyle,
+
           {
             transform: [
-              {
-                scale,
-              },
+              { scale },
             ],
+
+            opacity:
+              disabled
+                ? 0.6
+                : 1,
           },
-          style,
-          disabled
-            ? {
-                opacity: 0.5,
-              }
-            : null,
         ]}
       >
         {children}

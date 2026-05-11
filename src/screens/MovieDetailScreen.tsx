@@ -34,7 +34,9 @@ import PressScale from '../components/PressScale';
 export default function MovieDetailScreen() {
 
   const navigation: any = useNavigation();
+  const route: any = useRoute();
 
+  const { movie } = route.params;
   const { colors } = useTheme();
 
   const isWatchlisted =
@@ -47,9 +49,7 @@ export default function MovieDetailScreen() {
   const toggleWatchlist =
     useWatchlistStore((state) => state.toggle);
 
-  const route: any = useRoute();
 
-  const { movie } = route.params;
   const [genres, setGenres] =
     useState<any[]>([]);
 
@@ -290,93 +290,93 @@ export default function MovieDetailScreen() {
           >
             {movieGenres}
           </Text>
-{/* META INFO */}
+          {/* META INFO */}
 
-<View
-  style={{
-    flexDirection: 'row',
+          <View
+            style={{
+              flexDirection: 'row',
 
-    alignItems: 'center',
+              alignItems: 'center',
 
-    marginTop: 18,
+              marginTop: 18,
 
-    flexWrap: 'wrap',
-  }}
->
-  {/* YEAR */}
+              flexWrap: 'wrap',
+            }}
+          >
+            {/* YEAR */}
 
-  <View
-    style={{
-      backgroundColor: colors.chipBackground,
+            <View
+              style={{
+                backgroundColor: colors.chipBackground,
 
-      paddingHorizontal: 14,
-      paddingVertical: 8,
+                paddingHorizontal: 14,
+                paddingVertical: 8,
 
-      borderRadius: 20,
+                borderRadius: 20,
 
-      marginRight: 10,
-      marginBottom: 10,
-    }}
-  >
-    <Text
-      style={{
-        color: colors.chipText,
-        fontWeight: '600',
-      }}
-    >
-      {movie.release_date?.slice(0, 4)}
-    </Text>
-  </View>
+                marginRight: 10,
+                marginBottom: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.chipText,
+                  fontWeight: '600',
+                }}
+              >
+                {movie.release_date?.slice(0, 4)}
+              </Text>
+            </View>
 
-  {/* LANGUAGE */}
+            {/* LANGUAGE */}
 
-  <View
-    style={{
-      backgroundColor: colors.chipBackground,
+            <View
+              style={{
+                backgroundColor: colors.chipBackground,
 
-      paddingHorizontal: 14,
-      paddingVertical: 8,
+                paddingHorizontal: 14,
+                paddingVertical: 8,
 
-      borderRadius: 20,
+                borderRadius: 20,
 
-      marginRight: 10,
-      marginBottom: 10,
-    }}
-  >
-    <Text
-      style={{
-        color: colors.chipText,
-        fontWeight: '600',
-      }}
-    >
-      {movie.original_language?.toUpperCase()}
-    </Text>
-  </View>
+                marginRight: 10,
+                marginBottom: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.chipText,
+                  fontWeight: '600',
+                }}
+              >
+                {movie.original_language?.toUpperCase()}
+              </Text>
+            </View>
 
-  {/* POPULARITY */}
+            {/* POPULARITY */}
 
-  <View
-    style={{
-      backgroundColor: colors.chipBackground,
+            <View
+              style={{
+                backgroundColor: colors.chipBackground,
 
-      paddingHorizontal: 14,
-      paddingVertical: 8,
+                paddingHorizontal: 14,
+                paddingVertical: 8,
 
-      borderRadius: 20,
+                borderRadius: 20,
 
-      marginBottom: 10,
-    }}
-  >
-    <Text
-      style={{
-        color: colors.chipText,
-        fontWeight: '600',
-      }}
-    >
-      🔥 {Math.round(movie.popularity)}
-    </Text>
-  </View>
-</View>
+                marginBottom: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.chipText,
+                  fontWeight: '600',
+                }}
+              >
+                🔥 {Math.round(movie.popularity)}
+              </Text>
+            </View>
+          </View>
           {/* OVERVIEW */}
 
           <Text
@@ -460,7 +460,7 @@ export default function MovieDetailScreen() {
                   </Text>
                 </View>
               )
-            )}
+              )}
           </ScrollView>
 
           {similarLoading && (

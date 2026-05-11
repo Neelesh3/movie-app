@@ -113,7 +113,7 @@ export default function AppNavigator({
         gestureEnabled: true,
 
         contentStyle: {
-          backgroundColor: 'transparent',
+          backgroundColor: '#0B1020',
         },
       }}
     >
@@ -136,7 +136,7 @@ export default function AppNavigator({
         name="MovieDetail"
         component={MovieDetailScreen}
         options={{
-          animation: 'fade_from_bottom',
+          animation: 'slide_from_right',
 
           animationDuration: 360,
         }}

@@ -10,68 +10,108 @@ import {
 
 export type WatchlistStore = {
   items: any[];
+
   hydrated: boolean;
+
   hydrate: () => Promise<void>;
+
   toggle: (movie: any) => Promise<void>;
+
   isSaved: (movieId: number) => boolean;
 };
 
 export const useWatchlistStore =
   create<WatchlistStore>((set, get) => ({
+
     items: [],
 
     hydrated: false,
 
     hydrate: async () => {
 
-      const list =
-        await getWatchlist();
+      try {
 
-      set({
-        items: Array.isArray(list)
-          ? list
-          : [],
-        hydrated: true,
-      });
+        const list =
+          await getWatchlist();
+
+        set({
+          items:
+            Array.isArray(list)
+              ? list
+              : [],
+
+          hydrated: true,
+        });
+
+      } catch (error) {
+
+        console.log(error);
+
+        set({
+          items: [],
+
+          hydrated: true,
+        });
+      }
     },
 
     isSaved: (movieId: number) => {
 
       return get().items.some(
-        (m: any) => m?.id === movieId
+        (m: any) =>
+          m?.id === movieId
       );
     },
 
     toggle: async (movie: any) => {
 
-      const id = movie?.id;
+      try {
 
-      if (typeof id !== 'number') {
-        return;
-      }
+        const movieId =
+          movie?.id;
 
-      if (get().isSaved(id)) {
+        if (
+          typeof movieId !==
+          'number'
+        ) {
+          return;
+        }
 
-        await removeFromWatchlist(id);
+        const alreadySaved =
+          get().isSaved(movieId);
+
+        if (alreadySaved) {
+
+          await removeFromWatchlist(
+            movieId
+          );
+
+          set({
+            items:
+              get().items.filter(
+                (m: any) =>
+                  m?.id !== movieId
+              ),
+          });
+
+          return;
+        }
+
+        await addToWatchlist(movie);
+
+        const updatedList =
+          await getWatchlist();
 
         set({
-          items: get().items.filter(
-            (m: any) => m?.id !== id
-          ),
+          items:
+            Array.isArray(updatedList)
+              ? updatedList
+              : [],
         });
 
-        return;
+      } catch (error) {
+
+        console.log(error);
       }
-
-      await addToWatchlist(movie);
-
-      const fresh =
-        await getWatchlist();
-
-      set({
-        items: Array.isArray(fresh)
-          ? fresh
-          : [],
-      });
     },
   }));
