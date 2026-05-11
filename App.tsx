@@ -30,6 +30,10 @@ import {
   getOnboardingComplete,
 } from './src/services/onboarding';
 
+import {
+  useWatchlistStore,
+} from './src/stores/watchlistStore';
+
 function AppNavigationRoot() {
 
   const [
@@ -52,8 +56,14 @@ function AppNavigationRoot() {
 
       try {
 
-        const done =
-          await getOnboardingComplete();
+        const [, done] =
+          await Promise.all([
+            useWatchlistStore
+              .getState()
+              .hydrate(),
+
+            getOnboardingComplete(),
+          ]);
 
         if (!cancelled) {
           setSession({
@@ -63,6 +73,11 @@ function AppNavigationRoot() {
       } catch {
 
         if (!cancelled) {
+          await useWatchlistStore
+            .getState()
+            .hydrate()
+            .catch(() => {});
+
           setSession({
             showOnboarding: true,
           });

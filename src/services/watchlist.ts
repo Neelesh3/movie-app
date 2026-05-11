@@ -21,6 +21,28 @@ export async function getWatchlist() {
   }
 }
 
+export async function isInWatchlist(
+  movieId: number
+): Promise<boolean> {
+
+  try {
+
+    const list =
+      await getWatchlist();
+
+    return list.some(
+      (item: any) =>
+        item?.id === movieId
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+    return false;
+  }
+}
+
 export async function addToWatchlist(
   movie: any
 ) {

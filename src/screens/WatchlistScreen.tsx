@@ -1,7 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-} from 'react';
+import React from 'react';
 
 import {
   View,
@@ -20,12 +17,12 @@ import {
 } from '@react-navigation/native';
 
 import {
-  getWatchlist,
-} from '../services/watchlist';
-
-import {
   useTheme,
 } from '../context/ThemeContext';
+
+import {
+  useWatchlistStore,
+} from '../stores/watchlistStore';
 
 export default function WatchlistScreen() {
 
@@ -33,20 +30,8 @@ export default function WatchlistScreen() {
 
   const { colors } = useTheme();
 
-  const [movies, setMovies] =
-    useState<any[]>([]);
-
-  useEffect(() => {
-    loadWatchlist();
-  }, []);
-
-  async function loadWatchlist() {
-
-    const data =
-      await getWatchlist();
-
-    setMovies(data);
-  }
+  const movies =
+    useWatchlistStore((state) => state.items);
 
   return (
     <SafeAreaView
@@ -137,8 +122,8 @@ export default function WatchlistScreen() {
         <FlatList
           data={movies}
 
-          keyExtractor={(item, index) =>
-            index.toString()
+          keyExtractor={(item) =>
+            String(item.id)
           }
 
           contentContainerStyle={{

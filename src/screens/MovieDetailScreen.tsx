@@ -14,8 +14,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { addToWatchlist } from '../services/watchlist';
 import MovieRow from '../components/MovieRow';
+
+import {
+  useWatchlistStore,
+} from '../stores/watchlistStore';
 import {
   getGenres,
   getMovieCredits,
@@ -31,6 +34,16 @@ export default function MovieDetailScreen() {
   const navigation: any = useNavigation();
 
   const { colors } = useTheme();
+
+  const isWatchlisted =
+    useWatchlistStore((state) =>
+      state.items.some(
+        (m: any) => m?.id === movie?.id
+      )
+    );
+
+  const toggleWatchlist =
+    useWatchlistStore((state) => state.toggle);
 
   const route: any = useRoute();
 
@@ -548,12 +561,9 @@ export default function MovieDetailScreen() {
 
             <TouchableOpacity
 
-              onPress={async () => {
+              activeOpacity={0.85}
 
-                await addToWatchlist(movie);
-
-                alert('Added to Watchlist ❤️');
-              }}
+              onPress={() => toggleWatchlist(movie)}
 
               style={{
                 width: 60,
@@ -561,20 +571,32 @@ export default function MovieDetailScreen() {
 
                 borderRadius: 30,
 
-                backgroundColor: colors.surface,
+                backgroundColor: isWatchlisted
+                  ? '#FF4D6D'
+                  : colors.surface,
 
                 justifyContent: 'center',
                 alignItems: 'center',
 
                 borderWidth: 1,
 
-                borderColor: colors.borderSubtle,
+                borderColor: isWatchlisted
+                  ? '#FF4D6D'
+                  : colors.borderSubtle,
               }}
             >
               <Ionicons
-                name="heart"
+                name={
+                  isWatchlisted
+                    ? 'heart'
+                    : 'heart-outline'
+                }
                 size={24}
-                color="#FF4D6D"
+                color={
+                  isWatchlisted
+                    ? '#FFFFFF'
+                    : colors.textSecondary
+                }
               />
             </TouchableOpacity>
           </View>

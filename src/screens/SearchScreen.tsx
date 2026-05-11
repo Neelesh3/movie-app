@@ -11,7 +11,6 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,12 +24,12 @@ import {
 import { searchMovies } from '../api/tmdb';
 
 import {
-  addToWatchlist,
-} from '../services/watchlist';
-
-import {
   useTheme,
 } from '../context/ThemeContext';
+
+import {
+  useWatchlistStore,
+} from '../stores/watchlistStore';
 
 const DEBOUNCE_MS = 500;
 
@@ -50,6 +49,12 @@ export default function SearchScreen() {
   const navigation: any = useNavigation();
 
   const { colors } = useTheme();
+
+  const watchlistItems =
+    useWatchlistStore((state) => state.items);
+
+  const toggleWatchlist =
+    useWatchlistStore((state) => state.toggle);
 
   const [query, setQuery] =
     useState('');
@@ -454,18 +459,28 @@ export default function SearchScreen() {
       <FlatList
         data={movies}
 
-        keyExtractor={(item, index) =>
-          index.toString()
+        keyExtractor={(item) =>
+          String(item.id)
         }
 
         showsVerticalScrollIndicator={false}
+
+        extraData={watchlistItems}
 
         contentContainerStyle={{
           padding: 20,
           paddingBottom: 120,
         }}
 
-        renderItem={({ item }) => (
+        renderItem={({ item }) => {
+
+          const saved =
+            watchlistItems.some(
+              (m: any) =>
+                m?.id === item.id
+            );
+
+          return (
           <TouchableOpacity
             activeOpacity={0.85}
 
@@ -567,40 +582,71 @@ export default function SearchScreen() {
               </Text>
               <TouchableOpacity
 
-                onPress={async () => {
+                activeOpacity={0.85}
 
-                  await addToWatchlist(item);
-
-                  Alert.alert(
-                    'Added',
-                    'Movie added to Watchlist'
-                  );
-                }}
+                onPress={() =>
+                  toggleWatchlist(item)
+                }
 
                 style={{
                   marginTop: 16,
 
-                  backgroundColor: colors.accent,
+                  flexDirection: 'row',
 
-                  paddingVertical: 10,
+                  alignItems: 'center',
+
+                  justifyContent: 'center',
+
+                  paddingVertical: 11,
 
                   borderRadius: 14,
 
-                  alignItems: 'center',
+                  borderWidth: 1,
+
+                  borderColor: saved
+                    ? '#FF4D6D'
+                    : colors.borderSubtle,
+
+                  backgroundColor: saved
+                    ? '#FF4D6D'
+                    : 'transparent',
                 }}
               >
+                <Ionicons
+                  name={
+                    saved
+                      ? 'heart'
+                      : 'heart-outline'
+                  }
+                  size={18}
+                  color={
+                    saved
+                      ? '#FFFFFF'
+                      : colors.accent
+                  }
+                  style={{
+                    marginRight: 8,
+                  }}
+                />
+
                 <Text
                   style={{
-                    color: colors.onAccent,
+                    color: saved
+                      ? '#FFFFFF'
+                      : colors.textPrimary,
+
                     fontWeight: '600',
                   }}
                 >
-                  + Watchlist
+                  {saved
+                    ? 'Saved'
+                    : 'Watchlist'}
                 </Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
-        )}
+          );
+        }}
       />
     </SafeAreaView>
   );
