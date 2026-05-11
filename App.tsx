@@ -1,13 +1,13 @@
 import 'react-native-gesture-handler';
 
 import React, {
+  useCallback,
   useEffect,
   useState,
 } from 'react';
 
 import {
   View,
-  ActivityIndicator,
 } from 'react-native';
 
 import {
@@ -20,9 +20,10 @@ import {
 
 import AppNavigator from './src/navigation/AppNavigator';
 
+import CineBluishSplash from './src/components/CineBluishSplash';
+
 import {
   ThemeProvider,
-  useTheme,
 } from './src/context/ThemeContext';
 
 import {
@@ -31,13 +32,15 @@ import {
 
 function AppNavigationRoot() {
 
-  const { colors } = useTheme();
+  const [
+    showSplash,
+    setShowSplash,
+  ] = useState(true);
 
   const [
-    bootstrap,
-    setBootstrap,
+    session,
+    setSession,
   ] = useState<{
-    ready: boolean;
     showOnboarding: boolean;
   } | null>(null);
 
@@ -47,14 +50,23 @@ function AppNavigationRoot() {
 
     (async () => {
 
-      const done =
-        await getOnboardingComplete();
+      try {
 
-      if (!cancelled) {
-        setBootstrap({
-          ready: true,
-          showOnboarding: !done,
-        });
+        const done =
+          await getOnboardingComplete();
+
+        if (!cancelled) {
+          setSession({
+            showOnboarding: !done,
+          });
+        }
+      } catch {
+
+        if (!cancelled) {
+          setSession({
+            showOnboarding: true,
+          });
+        }
       }
     })();
 
@@ -63,31 +75,37 @@ function AppNavigationRoot() {
     };
   }, []);
 
-  if (!bootstrap?.ready) {
+  const handleSplashFinished =
+    useCallback(() => {
+      setShowSplash(false);
+    }, []);
+
+  if (showSplash) {
     return (
       <View
         style={{
           flex: 1,
-
-          justifyContent: 'center',
-          alignItems: 'center',
-
-          backgroundColor: colors.background,
         }}
       >
-        <ActivityIndicator
-          size="large"
-          color={colors.accent}
+        <CineBluishSplash
+          dataReady={session !== null}
+          onExitComplete={
+            handleSplashFinished
+          }
         />
       </View>
     );
+  }
+
+  if (!session) {
+    return null;
   }
 
   return (
     <NavigationContainer>
       <AppNavigator
         initialShowOnboarding={
-          bootstrap.showOnboarding
+          session.showOnboarding
         }
       />
     </NavigationContainer>
