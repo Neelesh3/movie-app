@@ -1,7 +1,5 @@
 import React from 'react';
 
-
-
 import {
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
@@ -18,6 +16,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import MovieDetailScreen from '../screens/MovieDetailScreen';
 import PlayerScreen from '../screens/PlayerScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,23 +29,23 @@ function BottomTabs() {
         headerShown: false,
 
         tabBarStyle: {
-            position: 'absolute',
+          position: 'absolute',
 
-  backgroundColor: 'rgba(21,28,46,0.92)',
+          backgroundColor: 'rgba(21,28,46,0.92)',
 
-  borderTopWidth: 0,
+          borderTopWidth: 0,
 
-  height: 70,
+          height: 70,
 
-  paddingBottom: 10,
-  paddingTop: 10,
+          paddingBottom: 10,
+          paddingTop: 10,
 
-  marginHorizontal: 20,
-  marginBottom: 15,
+          marginHorizontal: 20,
+          marginBottom: 15,
 
-  borderRadius: 25,
+          borderRadius: 25,
 
-  elevation: 0,
+          elevation: 0,
         },
 
         tabBarActiveTintColor: '#4DA2FF',
@@ -91,15 +90,30 @@ function BottomTabs() {
   );
 }
 
-export default function AppNavigator() {
+type AppNavigatorProps = {
+  initialShowOnboarding: boolean;
+};
+
+export default function AppNavigator({
+  initialShowOnboarding,
+}: AppNavigatorProps) {
 
   return (
-
     <Stack.Navigator
+      initialRouteName={
+        initialShowOnboarding
+          ? 'Onboarding'
+          : 'MainTabs'
+      }
       screenOptions={{
         headerShown: false,
       }}
     >
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+      />
+
       <Stack.Screen
         name="MainTabs"
         component={BottomTabs}
@@ -120,6 +134,5 @@ export default function AppNavigator() {
         component={WatchlistScreen}
       />
     </Stack.Navigator>
-
   );
 }
