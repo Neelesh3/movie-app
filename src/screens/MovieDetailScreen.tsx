@@ -22,9 +22,15 @@ import {
   getSimilarMovies,
 } from '../api/tmdb';
 
+import {
+  useTheme,
+} from '../context/ThemeContext';
+
 export default function MovieDetailScreen() {
 
   const navigation: any = useNavigation();
+
+  const { colors } = useTheme();
 
   const route: any = useRoute();
 
@@ -154,7 +160,7 @@ export default function MovieDetailScreen() {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: '#0B1020',
+        backgroundColor: colors.background,
       }}
     >
       <ScrollView
@@ -187,7 +193,7 @@ export default function MovieDetailScreen() {
               top: 50,
               left: 20,
 
-              backgroundColor: 'rgba(0,0,0,0.5)',
+              backgroundColor: colors.overlayScrim,
 
               width: 42,
               height: 42,
@@ -201,7 +207,7 @@ export default function MovieDetailScreen() {
             <Ionicons
               name="arrow-back"
               size={22}
-              color="#FFFFFF"
+              color={colors.onAccent}
             />
           </TouchableOpacity>
         </View>
@@ -211,13 +217,15 @@ export default function MovieDetailScreen() {
         <View
           style={{
             padding: 20,
+
+            backgroundColor: colors.background,
           }}
         >
           {/* TITLE */}
 
           <Text
             style={{
-              color: '#FFFFFF',
+              color: colors.textPrimary,
               fontSize: 30,
               fontWeight: 'bold',
             }}
@@ -243,7 +251,7 @@ export default function MovieDetailScreen() {
 
             <Text
               style={{
-                color: '#FFFFFF',
+                color: colors.textPrimary,
                 marginLeft: 6,
                 fontSize: 16,
               }}
@@ -256,7 +264,7 @@ export default function MovieDetailScreen() {
 
           <Text
             style={{
-              color: '#4DA2FF',
+              color: colors.accent,
 
               marginTop: 14,
 
@@ -284,7 +292,7 @@ export default function MovieDetailScreen() {
 
   <View
     style={{
-      backgroundColor: '#151C2E',
+      backgroundColor: colors.chipBackground,
 
       paddingHorizontal: 14,
       paddingVertical: 8,
@@ -297,7 +305,7 @@ export default function MovieDetailScreen() {
   >
     <Text
       style={{
-        color: '#FFFFFF',
+        color: colors.chipText,
         fontWeight: '600',
       }}
     >
@@ -309,7 +317,7 @@ export default function MovieDetailScreen() {
 
   <View
     style={{
-      backgroundColor: '#151C2E',
+      backgroundColor: colors.chipBackground,
 
       paddingHorizontal: 14,
       paddingVertical: 8,
@@ -322,7 +330,7 @@ export default function MovieDetailScreen() {
   >
     <Text
       style={{
-        color: '#FFFFFF',
+        color: colors.chipText,
         fontWeight: '600',
       }}
     >
@@ -334,7 +342,7 @@ export default function MovieDetailScreen() {
 
   <View
     style={{
-      backgroundColor: '#151C2E',
+      backgroundColor: colors.chipBackground,
 
       paddingHorizontal: 14,
       paddingVertical: 8,
@@ -346,7 +354,7 @@ export default function MovieDetailScreen() {
   >
     <Text
       style={{
-        color: '#FFFFFF',
+        color: colors.chipText,
         fontWeight: '600',
       }}
     >
@@ -358,7 +366,7 @@ export default function MovieDetailScreen() {
 
           <Text
             style={{
-              color: '#A8B3CF',
+              color: colors.textSecondary,
 
               marginTop: 20,
 
@@ -374,7 +382,7 @@ export default function MovieDetailScreen() {
 
           <Text
             style={{
-              color: '#FFFFFF',
+              color: colors.textPrimary,
 
               fontSize: 22,
               fontWeight: 'bold',
@@ -424,7 +432,7 @@ export default function MovieDetailScreen() {
                     numberOfLines={2}
 
                     style={{
-                      color: '#FFFFFF',
+                      color: colors.textPrimary,
 
                       fontSize: 12,
 
@@ -448,7 +456,7 @@ export default function MovieDetailScreen() {
             >
               <Text
                 style={{
-                  color: '#FFFFFF',
+                  color: colors.textPrimary,
 
                   fontSize: 22,
                   fontWeight: 'bold',
@@ -467,7 +475,7 @@ export default function MovieDetailScreen() {
                 }}
               >
                 <ActivityIndicator
-                  color="#4DA2FF"
+                  color={colors.accent}
                   size="small"
                 />
               </View>
@@ -505,7 +513,7 @@ export default function MovieDetailScreen() {
                 )
               }
               style={{
-                backgroundColor: '#4DA2FF',
+                backgroundColor: colors.accent,
 
                 flex: 1,
 
@@ -521,12 +529,12 @@ export default function MovieDetailScreen() {
               <Ionicons
                 name="play"
                 size={22}
-                color="#FFFFFF"
+                color={colors.onAccent}
               />
 
               <Text
                 style={{
-                  color: '#FFFFFF',
+                  color: colors.onAccent,
                   marginLeft: 8,
                   fontWeight: '600',
                   fontSize: 16,
@@ -553,10 +561,14 @@ export default function MovieDetailScreen() {
 
                 borderRadius: 30,
 
-                backgroundColor: '#151C2E',
+                backgroundColor: colors.surface,
 
                 justifyContent: 'center',
                 alignItems: 'center',
+
+                borderWidth: 1,
+
+                borderColor: colors.borderSubtle,
               }}
             >
               <Ionicons

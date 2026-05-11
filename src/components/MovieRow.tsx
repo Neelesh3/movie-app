@@ -8,6 +8,10 @@ import {
 
 import MovieCard from './MovieCard';
 
+import {
+  useTheme,
+} from '../context/ThemeContext';
+
 interface Props {
   title: string;
   movies: any[];
@@ -17,6 +21,8 @@ export default function MovieRow({
   title,
   movies,
 }: Props) {
+
+  const { colors } = useTheme();
 
   return (
     <View
@@ -38,7 +44,7 @@ export default function MovieRow({
       >
         <Text
           style={{
-            color: '#FFFFFF',
+            color: colors.textPrimary,
             fontSize: 24,
             fontWeight: 'bold',
           }}
@@ -48,7 +54,7 @@ export default function MovieRow({
 
         <Text
           style={{
-            color: '#4DA2FF',
+            color: colors.accent,
           }}
         >
           See All

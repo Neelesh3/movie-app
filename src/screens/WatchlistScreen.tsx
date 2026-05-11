@@ -23,9 +23,15 @@ import {
   getWatchlist,
 } from '../services/watchlist';
 
+import {
+  useTheme,
+} from '../context/ThemeContext';
+
 export default function WatchlistScreen() {
 
   const navigation: any = useNavigation();
+
+  const { colors } = useTheme();
 
   const [movies, setMovies] =
     useState<any[]>([]);
@@ -46,7 +52,7 @@ export default function WatchlistScreen() {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: '#0B1020',
+        backgroundColor: colors.background,
       }}
     >
       {/* HEADER */}
@@ -69,13 +75,13 @@ export default function WatchlistScreen() {
           <Ionicons
             name="arrow-back"
             size={26}
-            color="#FFFFFF"
+            color={colors.textPrimary}
           />
         </TouchableOpacity>
 
         <Text
           style={{
-            color: '#FFFFFF',
+            color: colors.textPrimary,
 
             fontSize: 28,
             fontWeight: 'bold',
@@ -101,12 +107,12 @@ export default function WatchlistScreen() {
           <Ionicons
             name="heart-outline"
             size={70}
-            color="#4DA2FF"
+            color={colors.accent}
           />
 
           <Text
             style={{
-              color: '#FFFFFF',
+              color: colors.textPrimary,
 
               fontSize: 22,
               fontWeight: 'bold',
@@ -119,7 +125,7 @@ export default function WatchlistScreen() {
 
           <Text
             style={{
-              color: '#A8B3CF',
+              color: colors.textSecondary,
 
               marginTop: 10,
             }}
@@ -159,11 +165,15 @@ export default function WatchlistScreen() {
 
                 marginBottom: 18,
 
-                backgroundColor: '#151C2E',
+                backgroundColor: colors.surface,
 
                 borderRadius: 20,
 
                 overflow: 'hidden',
+
+                borderWidth: 1,
+
+                borderColor: colors.borderSubtle,
               }}
             >
               {/* POSTER */}
@@ -192,7 +202,7 @@ export default function WatchlistScreen() {
                   numberOfLines={2}
 
                   style={{
-                    color: '#FFFFFF',
+                    color: colors.textPrimary,
                     fontSize: 18,
                     fontWeight: 'bold',
                   }}
@@ -216,7 +226,7 @@ export default function WatchlistScreen() {
 
                   <Text
                     style={{
-                      color: '#FFFFFF',
+                      color: colors.textPrimary,
                       marginLeft: 6,
                     }}
                   >
@@ -228,7 +238,7 @@ export default function WatchlistScreen() {
                   numberOfLines={4}
 
                   style={{
-                    color: '#A8B3CF',
+                    color: colors.textSecondary,
 
                     marginTop: 12,
 

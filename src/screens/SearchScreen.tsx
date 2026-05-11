@@ -28,6 +28,10 @@ import {
   addToWatchlist,
 } from '../services/watchlist';
 
+import {
+  useTheme,
+} from '../context/ThemeContext';
+
 const DEBOUNCE_MS = 500;
 
 const MIN_QUERY_LENGTH = 2;
@@ -44,6 +48,8 @@ export default function SearchScreen() {
   ];
 
   const navigation: any = useNavigation();
+
+  const { colors } = useTheme();
 
   const [query, setQuery] =
     useState('');
@@ -195,7 +201,7 @@ export default function SearchScreen() {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: '#0B1020',
+        backgroundColor: colors.background,
       }}
     >
       {/* HEADER */}
@@ -208,7 +214,7 @@ export default function SearchScreen() {
       >
         <Text
           style={{
-            color: '#FFFFFF',
+            color: colors.textPrimary,
             fontSize: 34,
             fontWeight: 'bold',
           }}
@@ -218,7 +224,7 @@ export default function SearchScreen() {
 
         <Text
           style={{
-            color: '#A8B3CF',
+            color: colors.textSecondary,
             marginTop: 5,
           }}
         >
@@ -236,18 +242,22 @@ export default function SearchScreen() {
           marginTop: 25,
           marginHorizontal: 20,
 
-          backgroundColor: '#151C2E',
+          backgroundColor: colors.surface,
 
           borderRadius: 18,
 
           paddingHorizontal: 16,
           paddingVertical: 14,
+
+          borderWidth: 1,
+
+          borderColor: colors.borderSubtle,
         }}
       >
         <Ionicons
           name="search"
           size={22}
-          color="#A8B3CF"
+          color={colors.textSecondary}
         />
 
         <TextInput
@@ -257,10 +267,10 @@ export default function SearchScreen() {
 
           placeholder="Search movies..."
 
-          placeholderTextColor="#A8B3CF"
+          placeholderTextColor={colors.textSecondary}
 
           style={{
-            color: '#FFFFFF',
+            color: colors.textPrimary,
             marginLeft: 12,
             flex: 1,
           }}
@@ -281,12 +291,12 @@ export default function SearchScreen() {
           <Ionicons
             name="film-outline"
             size={70}
-            color="#4DA2FF"
+            color={colors.accent}
           />
 
           <Text
             style={{
-              color: '#FFFFFF',
+              color: colors.textPrimary,
 
               fontSize: 22,
               fontWeight: 'bold',
@@ -299,7 +309,7 @@ export default function SearchScreen() {
 
           <Text
             style={{
-              color: '#A8B3CF',
+              color: colors.textSecondary,
 
               marginTop: 10,
 
@@ -338,7 +348,7 @@ export default function SearchScreen() {
                   }
 
                   style={{
-                    backgroundColor: '#151C2E',
+                    backgroundColor: colors.surface,
 
                     paddingHorizontal: 18,
                     paddingVertical: 10,
@@ -346,11 +356,15 @@ export default function SearchScreen() {
                     borderRadius: 30,
 
                     margin: 6,
+
+                    borderWidth: 1,
+
+                    borderColor: colors.borderSubtle,
                   }}
                 >
                   <Text
                     style={{
-                      color: '#FFFFFF',
+                      color: colors.textPrimary,
                       fontWeight: '500',
                     }}
                   >
@@ -375,12 +389,12 @@ export default function SearchScreen() {
         >
           <ActivityIndicator
             size="large"
-            color="#4DA2FF"
+            color={colors.accent}
           />
 
           <Text
             style={{
-              color: '#A8B3CF',
+              color: colors.textSecondary,
 
               marginTop: 16,
 
@@ -404,12 +418,12 @@ export default function SearchScreen() {
           <Ionicons
             name="search-outline"
             size={70}
-            color="#4DA2FF"
+            color={colors.accent}
           />
 
           <Text
             style={{
-              color: '#FFFFFF',
+              color: colors.textPrimary,
 
               fontSize: 22,
               fontWeight: 'bold',
@@ -422,7 +436,7 @@ export default function SearchScreen() {
 
           <Text
             style={{
-              color: '#A8B3CF',
+              color: colors.textSecondary,
 
               marginTop: 10,
 
@@ -469,11 +483,15 @@ export default function SearchScreen() {
 
               marginBottom: 18,
 
-              backgroundColor: '#151C2E',
+              backgroundColor: colors.surface,
 
               borderRadius: 20,
 
               overflow: 'hidden',
+
+              borderWidth: 1,
+
+              borderColor: colors.borderSubtle,
             }}
           >
             {/* POSTER */}
@@ -502,7 +520,7 @@ export default function SearchScreen() {
                 numberOfLines={2}
 
                 style={{
-                  color: '#FFFFFF',
+                  color: colors.textPrimary,
                   fontSize: 18,
                   fontWeight: 'bold',
                 }}
@@ -526,7 +544,7 @@ export default function SearchScreen() {
 
                 <Text
                   style={{
-                    color: '#FFFFFF',
+                    color: colors.textPrimary,
                     marginLeft: 6,
                   }}
                 >
@@ -538,7 +556,7 @@ export default function SearchScreen() {
                 numberOfLines={4}
 
                 style={{
-                  color: '#A8B3CF',
+                  color: colors.textSecondary,
 
                   marginTop: 12,
 
@@ -562,7 +580,7 @@ export default function SearchScreen() {
                 style={{
                   marginTop: 16,
 
-                  backgroundColor: '#4DA2FF',
+                  backgroundColor: colors.accent,
 
                   paddingVertical: 10,
 
@@ -573,7 +591,7 @@ export default function SearchScreen() {
               >
                 <Text
                   style={{
-                    color: '#FFFFFF',
+                    color: colors.onAccent,
                     fontWeight: '600',
                   }}
                 >

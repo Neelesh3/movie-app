@@ -32,9 +32,15 @@ import {
   saveContinueWatching,
 } from '../services/continueWatching';
 
+import {
+  useTheme,
+} from '../context/ThemeContext';
+
 export default function PlayerScreen() {
 
   const navigation: any = useNavigation();
+
+  const { colors } = useTheme();
 
   const route: any = useRoute();
 
@@ -75,7 +81,7 @@ export default function PlayerScreen() {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: colors.background,
       }}
     >
       {/* VIDEO PLAYER */}
@@ -93,7 +99,7 @@ export default function PlayerScreen() {
           width: '100%',
           height: 260,
 
-          backgroundColor: '#000',
+          backgroundColor: colors.videoBackdrop,
         }}
 
         useNativeControls
@@ -114,7 +120,7 @@ export default function PlayerScreen() {
 
         <Text
           style={{
-            color: '#FFFFFF',
+            color: colors.textPrimary,
 
             fontSize: 28,
             fontWeight: 'bold',
@@ -163,7 +169,7 @@ export default function PlayerScreen() {
 
         <Text
           style={{
-            color: '#4DA2FF',
+            color: colors.accent,
 
             marginTop: 10,
 
@@ -177,7 +183,7 @@ export default function PlayerScreen() {
 
         <Text
           style={{
-            color: '#A8B3CF',
+            color: colors.textSecondary,
 
             marginTop: 20,
 
@@ -209,7 +215,7 @@ export default function PlayerScreen() {
 
           borderRadius: 21,
 
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: colors.overlayScrim,
 
           justifyContent: 'center',
           alignItems: 'center',
@@ -218,7 +224,7 @@ export default function PlayerScreen() {
         <Ionicons
           name="arrow-back"
           size={24}
-          color="#FFFFFF"
+          color={colors.onAccent}
         />
       </TouchableOpacity>
     </SafeAreaView>

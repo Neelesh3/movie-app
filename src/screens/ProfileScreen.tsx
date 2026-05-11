@@ -52,6 +52,7 @@ export default function ProfileScreen() {
   const {
     darkMode,
     toggleTheme,
+    colors,
   } = useTheme();
 
   return (
@@ -59,10 +60,7 @@ export default function ProfileScreen() {
       style={{
         flex: 1,
 
-        backgroundColor:
-          darkMode
-            ? '#0B1020'
-            : '#EEF2F7',
+        backgroundColor: colors.background,
       }}
     >
       <ScrollView
@@ -92,16 +90,13 @@ export default function ProfileScreen() {
               borderRadius: 55,
 
               borderWidth: 3,
-              borderColor: '#4DA2FF',
+              borderColor: colors.accent,
             }}
           />
 
           <Text
             style={{
-              color:
-                darkMode
-                  ? '#FFFFFF'
-                  : '#111111',
+              color: colors.textPrimary,
 
               fontSize: 28,
               fontWeight: 'bold',
@@ -114,7 +109,7 @@ export default function ProfileScreen() {
 
           <Text
             style={{
-              color: '#A8B3CF',
+              color: colors.textSecondary,
               marginTop: 5,
             }}
           >
@@ -155,10 +150,7 @@ export default function ProfileScreen() {
               style={{
                 flex: 1,
 
-                backgroundColor:
-                  darkMode
-                    ? '#151C2E'
-                    : '#FFFFFF',
+                backgroundColor: colors.surface,
 
                 marginHorizontal: 6,
 
@@ -167,14 +159,15 @@ export default function ProfileScreen() {
                 borderRadius: 22,
 
                 alignItems: 'center',
+
+                borderWidth: 1,
+
+                borderColor: colors.borderSubtle,
               }}
             >
               <Text
                 style={{
-                  color:
-                    darkMode
-                      ? '#FFFFFF'
-                      : '#111111',
+                  color: colors.textPrimary,
 
                   fontSize: 22,
                   fontWeight: 'bold',
@@ -185,7 +178,7 @@ export default function ProfileScreen() {
 
               <Text
                 style={{
-                  color: '#A8B3CF',
+                  color: colors.textSecondary,
                   marginTop: 6,
                 }}
               >
@@ -215,16 +208,17 @@ export default function ProfileScreen() {
               justifyContent: 'space-between',
               alignItems: 'center',
 
-              backgroundColor:
-                darkMode
-                  ? '#151C2E'
-                  : '#FFFFFF',
+              backgroundColor: colors.surface,
 
               padding: 18,
 
               borderRadius: 22,
 
               marginBottom: 16,
+
+              borderWidth: 1,
+
+              borderColor: colors.borderSubtle,
             }}
           >
             <View
@@ -242,15 +236,12 @@ export default function ProfileScreen() {
 
                 size={24}
 
-                color="#4DA2FF"
+                color={colors.accent}
               />
 
               <Text
                 style={{
-                  color:
-                    darkMode
-                      ? '#FFFFFF'
-                      : '#111111',
+                  color: colors.textPrimary,
 
                   marginLeft: 16,
 
@@ -267,7 +258,7 @@ export default function ProfileScreen() {
             <Ionicons
               name="swap-horizontal"
               size={22}
-              color="#A8B3CF"
+              color={colors.textSecondary}
             />
           </TouchableOpacity>
 
@@ -292,16 +283,17 @@ export default function ProfileScreen() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
 
-                backgroundColor:
-                  darkMode
-                    ? '#151C2E'
-                    : '#FFFFFF',
+                backgroundColor: colors.surface,
 
                 padding: 18,
 
                 borderRadius: 22,
 
                 marginBottom: 16,
+
+                borderWidth: 1,
+
+                borderColor: colors.borderSubtle,
               }}
             >
               <View
@@ -313,15 +305,12 @@ export default function ProfileScreen() {
                 <Ionicons
                   name={item.icon as any}
                   size={24}
-                  color="#4DA2FF"
+                  color={colors.accent}
                 />
 
                 <Text
                   style={{
-                    color:
-                      darkMode
-                        ? '#FFFFFF'
-                        : '#111111',
+                    color: colors.textPrimary,
 
                     marginLeft: 16,
 
@@ -336,7 +325,7 @@ export default function ProfileScreen() {
               <Ionicons
                 name="chevron-forward"
                 size={22}
-                color="#A8B3CF"
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
 

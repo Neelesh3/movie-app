@@ -39,8 +39,10 @@ import {
 
 export default function HomeScreen() {
 
-  const { darkMode } =
-    useTheme();
+  const {
+    darkMode,
+    colors,
+  } = useTheme();
 
   const [trendingMovies, setTrendingMovies] =
     useState<any[]>([]);
@@ -129,10 +131,7 @@ export default function HomeScreen() {
       style={{
         flex: 1,
 
-        backgroundColor:
-          darkMode
-            ? '#0B1020'
-            : '#F5F7FB',
+        backgroundColor: colors.background,
       }}
     >
       <StatusBar
@@ -149,7 +148,7 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#4DA2FF"
+            tintColor={colors.accent}
           />
         }
 
@@ -174,10 +173,7 @@ export default function HomeScreen() {
           <View>
             <Text
               style={{
-                color:
-                  darkMode
-                    ? '#FFFFFF'
-                    : '#111111',
+                color: colors.textPrimary,
 
                 fontSize: 30,
                 fontWeight: 'bold',
@@ -190,7 +186,7 @@ export default function HomeScreen() {
 
             <Text
               style={{
-                color: '#A8B3CF',
+                color: colors.textSecondary,
                 marginTop: 2,
               }}
             >
@@ -209,11 +205,7 @@ export default function HomeScreen() {
               name="search"
               size={24}
 
-              color={
-                darkMode
-                  ? '#FFFFFF'
-                  : '#111111'
-              }
+              color={colors.textPrimary}
             />
 
             <Image

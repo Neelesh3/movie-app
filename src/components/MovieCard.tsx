@@ -9,6 +9,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+import {
+  useTheme,
+} from '../context/ThemeContext';
+
 interface MovieCardProps {
   movie: any;
 }
@@ -18,6 +22,8 @@ export default function MovieCard({
 }: MovieCardProps) {
 
   const navigation: any = useNavigation();
+
+  const { colors } = useTheme();
 
   if (!movie) {
     return null;
@@ -43,14 +49,14 @@ export default function MovieCard({
     >
       <View
         style={{
-          backgroundColor: '#151C2E',
+          backgroundColor: colors.surface,
 
           borderRadius: 22,
 
           overflow: 'hidden',
 
           borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.08)',
+          borderColor: colors.borderSubtle,
         }}
       >
         <Image
@@ -76,7 +82,7 @@ export default function MovieCard({
             numberOfLines={1}
 
             style={{
-              color: '#FFFFFF',
+              color: colors.textPrimary,
               fontSize: 15,
               fontWeight: '600',
               textAlign: 'center',
