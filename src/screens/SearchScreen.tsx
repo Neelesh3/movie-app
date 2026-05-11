@@ -31,6 +31,8 @@ import {
   useWatchlistStore,
 } from '../stores/watchlistStore';
 
+import PressScale from '../components/PressScale';
+
 const DEBOUNCE_MS = 500;
 
 const MIN_QUERY_LENGTH = 2;
@@ -580,14 +582,10 @@ export default function SearchScreen() {
               >
                 {item.overview}
               </Text>
-              <TouchableOpacity
-
-                activeOpacity={0.85}
-
+              <PressScale
                 onPress={() =>
                   toggleWatchlist(item)
                 }
-
                 style={{
                   marginTop: 16,
 
@@ -642,7 +640,7 @@ export default function SearchScreen() {
                     ? 'Saved'
                     : 'Watchlist'}
                 </Text>
-              </TouchableOpacity>
+              </PressScale>
             </View>
           </TouchableOpacity>
           );

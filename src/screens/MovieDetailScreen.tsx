@@ -29,6 +29,8 @@ import {
   useTheme,
 } from '../context/ThemeContext';
 
+import PressScale from '../components/PressScale';
+
 export default function MovieDetailScreen() {
 
   const navigation: any = useNavigation();
@@ -559,12 +561,10 @@ export default function MovieDetailScreen() {
 
             {/* WATCHLIST */}
 
-            <TouchableOpacity
-
-              activeOpacity={0.85}
-
-              onPress={() => toggleWatchlist(movie)}
-
+            <PressScale
+              onPress={() =>
+                toggleWatchlist(movie)
+              }
               style={{
                 width: 60,
                 height: 60,
@@ -598,7 +598,7 @@ export default function MovieDetailScreen() {
                     : colors.textSecondary
                 }
               />
-            </TouchableOpacity>
+            </PressScale>
           </View>
         </View>
       </ScrollView>

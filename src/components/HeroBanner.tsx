@@ -7,7 +7,6 @@ import {
   View,
   Text,
   ImageBackground,
-  TouchableOpacity,
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -16,6 +15,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import {
   useNavigation,
 } from '@react-navigation/native';
+
+import PressScale from './PressScale';
 
 type Props = {
   movies: any[];
@@ -70,24 +71,20 @@ export default function HeroBanner({
         justifyContent: 'flex-end',
       }}
     >
-      {/* OVERLAY */}
+      <LinearGradient
 
-<LinearGradient
+        colors={[
+          'transparent',
+          'rgba(0,0,0,0.2)',
+          'rgba(0,0,0,0.95)',
+        ]}
 
-  colors={[
-    'transparent',
-    'rgba(0,0,0,0.2)',
-    'rgba(0,0,0,0.95)',
-  ]}
+        style={{
+          flex: 1,
 
-  style={{
-    flex: 1,
-
-    justifyContent: 'flex-end',
-  }}
->
-        {/* CONTENT */}
-
+          justifyContent: 'flex-end',
+        }}
+      >
         <View
           style={{
             padding: 20,
@@ -121,8 +118,6 @@ export default function HeroBanner({
             {movie.overview}
           </Text>
 
-          {/* BUTTONS */}
-
           <View
             style={{
               flexDirection: 'row',
@@ -130,9 +125,7 @@ export default function HeroBanner({
               marginTop: 25,
             }}
           >
-            <TouchableOpacity
-              activeOpacity={0.85}
-
+            <PressScale
               onPress={() =>
                 navigation.navigate(
                   'Player',
@@ -141,7 +134,6 @@ export default function HeroBanner({
                   }
                 )
               }
-
               style={{
                 backgroundColor: '#4DA2FF',
 
@@ -173,11 +165,9 @@ export default function HeroBanner({
               >
                 Play
               </Text>
-            </TouchableOpacity>
+            </PressScale>
 
-            <TouchableOpacity
-              activeOpacity={0.85}
-
+            <PressScale
               onPress={() =>
                 navigation.navigate(
                   'MovieDetail',
@@ -186,7 +176,6 @@ export default function HeroBanner({
                   }
                 )
               }
-
               style={{
                 backgroundColor:
                   'rgba(255,255,255,0.2)',
@@ -217,51 +206,45 @@ export default function HeroBanner({
               >
                 Details
               </Text>
-            </TouchableOpacity>
+            </PressScale>
           </View>
 
-          
-{/* INDICATORS */}
+          <View
+            style={{
+              flexDirection: 'row',
 
-<View
-  style={{
-    flexDirection: 'row',
+              justifyContent: 'center',
 
-    justifyContent: 'center',
+              marginBottom: 18,
+            }}
+          >
+            {movies.map((_: any, index: number) => (
 
-    marginBottom: 18,
-  }}
->
-  {movies.map((_: any, index: number) => (
+              <View
+                key={index}
 
-    <View
-      key={index}
+                style={{
+                  width:
+                    currentIndex === index
+                      ? 24
+                      : 8,
 
-      style={{
-        width:
-          currentIndex === index
-            ? 24
-            : 8,
+                  height: 8,
 
-        height: 8,
+                  borderRadius: 4,
 
-        borderRadius: 4,
+                  backgroundColor:
+                    currentIndex === index
+                      ? '#4DA2FF'
+                      : 'rgba(255,255,255,0.5)',
 
-        backgroundColor:
-          currentIndex === index
-            ? '#4DA2FF'
-            : 'rgba(255,255,255,0.5)',
-
-        marginHorizontal: 4,
-      }}
-    />
-  ))}
-</View>
-
-</View>
-
-</LinearGradient>
-
-</ImageBackground>
+                  marginHorizontal: 4,
+                }}
+              />
+            ))}
+          </View>
+        </View>
+      </LinearGradient>
+    </ImageBackground>
   );
 }

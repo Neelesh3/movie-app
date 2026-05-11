@@ -8,7 +8,6 @@ import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
   StatusBar,
   useWindowDimensions,
   type ListRenderItemInfo,
@@ -38,6 +37,8 @@ import {
 import {
   setOnboardingComplete,
 } from '../services/onboarding';
+
+import PressScale from '../components/PressScale';
 
 type SlideModel = {
   id: string;
@@ -377,7 +378,7 @@ export default function OnboardingScreen() {
         }
       />
 
-      <TouchableOpacity
+      <PressScale
         onPress={finishOnboarding}
         hitSlop={{
           top: 12,
@@ -385,6 +386,7 @@ export default function OnboardingScreen() {
           left: 16,
           right: 16,
         }}
+        scaleTo={0.94}
         style={{
           position: 'absolute',
 
@@ -408,7 +410,7 @@ export default function OnboardingScreen() {
         >
           Skip
         </Text>
-      </TouchableOpacity>
+      </PressScale>
 
       <View
         style={{
@@ -516,11 +518,9 @@ export default function OnboardingScreen() {
           ))}
         </View>
 
-        <TouchableOpacity
-          activeOpacity={0.9}
-
+        <PressScale
           onPress={goNext}
-
+          scaleTo={0.98}
           style={{
             backgroundColor: colors.accent,
 
@@ -560,7 +560,7 @@ export default function OnboardingScreen() {
             size={22}
             color={colors.onAccent}
           />
-        </TouchableOpacity>
+        </PressScale>
       </View>
     </SafeAreaView>
   );

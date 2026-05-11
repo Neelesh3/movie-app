@@ -6,12 +6,13 @@ import {
   View,
   Text,
   Image,
-  TouchableOpacity,
 } from 'react-native';
 
 import {
   useTheme,
 } from '../context/ThemeContext';
+
+import PressScale from './PressScale';
 
 interface MovieCardProps {
   movie: any;
@@ -30,9 +31,7 @@ export default function MovieCard({
   }
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
-
+    <PressScale
       onPress={() =>
         navigation.navigate(
           'MovieDetail',
@@ -41,7 +40,6 @@ export default function MovieCard({
           }
         )
       }
-
       style={{
         marginRight: 16,
         width: 140,
@@ -92,6 +90,6 @@ export default function MovieCard({
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </PressScale>
   );
 }

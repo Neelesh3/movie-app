@@ -107,11 +107,24 @@ export default function AppNavigator({
       }
       screenOptions={{
         headerShown: false,
+
+        fullScreenGestureEnabled: true,
+
+        gestureEnabled: true,
+
+        contentStyle: {
+          backgroundColor: 'transparent',
+        },
       }}
     >
       <Stack.Screen
         name="Onboarding"
         component={OnboardingScreen}
+        options={{
+          animation: 'fade',
+
+          animationDuration: 420,
+        }}
       />
 
       <Stack.Screen
@@ -122,16 +135,31 @@ export default function AppNavigator({
       <Stack.Screen
         name="MovieDetail"
         component={MovieDetailScreen}
+        options={{
+          animation: 'fade_from_bottom',
+
+          animationDuration: 360,
+        }}
       />
 
       <Stack.Screen
         name="Player"
         component={PlayerScreen}
+        options={{
+          animation: 'fade_from_bottom',
+
+          animationDuration: 360,
+        }}
       />
 
       <Stack.Screen
         name="Watchlist"
         component={WatchlistScreen}
+        options={{
+          animation: 'fade_from_bottom',
+
+          animationDuration: 340,
+        }}
       />
     </Stack.Navigator>
   );
