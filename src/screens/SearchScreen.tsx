@@ -28,6 +28,10 @@ import {
   addToWatchlist,
 } from '../services/watchlist';
 
+const DEBOUNCE_MS = 500;
+
+const MIN_QUERY_LENGTH = 2;
+
 export default function SearchScreen() {
 
   const trendingSearches = [
@@ -47,47 +51,145 @@ export default function SearchScreen() {
   const [debouncedQuery, setDebouncedQuery] =
     useState('');
 
-  useEffect(() => {
-
-    const timer =
-      setTimeout(() => {
-
-        setDebouncedQuery(query);
-
-      }, 500);
-
-    return () =>
-      clearTimeout(timer);
-
-  }, [query]);
-
   const [movies, setMovies] =
     useState<any[]>([]);
 
   const [loading, setLoading] =
     useState(false);
 
-  async function handleSearch(text: string) {
+  const trimmedQuery =
+    query.trim();
 
-    setQuery(text);
+  const trimmedDebounced =
+    debouncedQuery.trim();
 
-    if (text.trim().length < 2) {
-      setMovies([]);
+  const waitingForDebounce =
+    trimmedQuery.length >=
+      MIN_QUERY_LENGTH &&
+    trimmedQuery !==
+      trimmedDebounced;
+
+  useEffect(() => {
+
+    const trimmed =
+      query.trim();
+
+    if (
+      trimmed.length <
+      MIN_QUERY_LENGTH
+    ) {
+      setDebouncedQuery(query);
+
       return;
     }
 
-    try {
-      setLoading(true);
-      const results =
-        await searchMovies(debouncedQuery);
+    const timer =
+      setTimeout(() => {
 
-      setMovies(results);
+        setDebouncedQuery(query);
+
+      }, DEBOUNCE_MS);
+
+    return () =>
+      clearTimeout(timer);
+
+  }, [query]);
+
+  useEffect(() => {
+
+    const trimmed =
+      debouncedQuery.trim();
+
+    if (
+      trimmed.length <
+      MIN_QUERY_LENGTH
+    ) {
+      setMovies([]);
+
       setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
+
+      return;
     }
-  }
+
+    const controller =
+      new AbortController();
+
+    setLoading(true);
+
+    (async () => {
+
+      try {
+
+        const results =
+          await searchMovies(
+            trimmed,
+            controller.signal
+          );
+
+        if (
+          !controller.signal.aborted
+        ) {
+          setMovies(
+            Array.isArray(results)
+              ? results
+              : []
+          );
+        }
+
+      } catch (error: unknown) {
+
+        const name =
+          error &&
+          typeof error === 'object' &&
+          'name' in error
+            ? (error as { name?: string })
+                .name
+            : undefined;
+
+        if (name === 'AbortError') {
+          return;
+        }
+
+        console.log(error);
+
+        if (
+          !controller.signal.aborted
+        ) {
+          setMovies([]);
+        }
+
+      } finally {
+
+        if (
+          !controller.signal.aborted
+        ) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, [debouncedQuery]);
+
+  const showSearchLoading =
+    waitingForDebounce ||
+    (loading &&
+      trimmedDebounced.length >=
+        MIN_QUERY_LENGTH);
+
+  const showIdleSuggestions =
+    movies.length === 0 &&
+    !showSearchLoading &&
+    trimmedQuery.length <
+      MIN_QUERY_LENGTH;
+
+  const showNoResults =
+    movies.length === 0 &&
+    !showSearchLoading &&
+    trimmedDebounced.length >=
+      MIN_QUERY_LENGTH;
 
   return (
     <SafeAreaView
@@ -151,7 +253,7 @@ export default function SearchScreen() {
         <TextInput
           value={query}
 
-          onChangeText={handleSearch}
+          onChangeText={setQuery}
 
           placeholder="Search movies..."
 
@@ -164,7 +266,7 @@ export default function SearchScreen() {
           }}
         />
       </View>
-      {movies.length === 0 && query.length < 2 && (
+      {showIdleSuggestions && (
 
         <View
           style={{
@@ -232,7 +334,7 @@ export default function SearchScreen() {
                   key={index}
 
                   onPress={() =>
-                    handleSearch(item)
+                    setQuery(item)
                   }
 
                   style={{
@@ -262,7 +364,7 @@ export default function SearchScreen() {
 
       )}
       {/* RESULTS */}
-      {loading && (
+      {showSearchLoading && (
 
         <View
           style={{
@@ -290,52 +392,51 @@ export default function SearchScreen() {
         </View>
 
       )}
-      {movies.length === 0 &&
-        query.length >= 2 && (
+      {showNoResults && (
 
-          <View
+        <View
+          style={{
+            alignItems: 'center',
+
+            marginTop: 100,
+          }}
+        >
+          <Ionicons
+            name="search-outline"
+            size={70}
+            color="#4DA2FF"
+          />
+
+          <Text
             style={{
-              alignItems: 'center',
+              color: '#FFFFFF',
 
-              marginTop: 100,
+              fontSize: 22,
+              fontWeight: 'bold',
+
+              marginTop: 20,
             }}
           >
-            <Ionicons
-              name="search-outline"
-              size={70}
-              color="#4DA2FF"
-            />
+            No Results Found
+          </Text>
 
-            <Text
-              style={{
-                color: '#FFFFFF',
+          <Text
+            style={{
+              color: '#A8B3CF',
 
-                fontSize: 22,
-                fontWeight: 'bold',
+              marginTop: 10,
 
-                marginTop: 20,
-              }}
-            >
-              No Results Found
-            </Text>
+              textAlign: 'center',
 
-            <Text
-              style={{
-                color: '#A8B3CF',
+              paddingHorizontal: 40,
+            }}
+          >
+            Try searching with a
+            different movie name
+          </Text>
+        </View>
 
-                marginTop: 10,
-
-                textAlign: 'center',
-
-                paddingHorizontal: 40,
-              }}
-            >
-              Try searching with a
-              different movie name
-            </Text>
-          </View>
-
-        )}
+      )}
       <FlatList
         data={movies}
 

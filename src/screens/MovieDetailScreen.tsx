@@ -6,6 +6,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,9 +15,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { addToWatchlist } from '../services/watchlist';
+import MovieRow from '../components/MovieRow';
 import {
   getGenres,
   getMovieCredits,
+  getSimilarMovies,
 } from '../api/tmdb';
 
 export default function MovieDetailScreen() {
@@ -32,10 +35,78 @@ export default function MovieDetailScreen() {
   const [cast, setCast] =
     useState<any[]>([]);
 
+  const [
+    similarMovies,
+    setSimilarMovies,
+  ] = useState<any[]>([]);
+
+  const [
+    similarLoading,
+    setSimilarLoading,
+  ] = useState(false);
+
   useEffect(() => {
     loadGenres();
     loadCast();
   }, []);
+
+  useEffect(() => {
+
+    const movieId = movie?.id;
+
+    if (typeof movieId !== 'number') {
+      return;
+    }
+
+    let cancelled = false;
+
+    setSimilarMovies([]);
+
+    setSimilarLoading(true);
+
+    async function loadSimilar() {
+
+      try {
+
+        const results =
+          await getSimilarMovies(movieId);
+
+        if (!cancelled) {
+          const list =
+            Array.isArray(results)
+              ? results
+              : [];
+
+          setSimilarMovies(
+            list.filter(
+              (item: any) =>
+                item?.id !== movieId
+            )
+          );
+        }
+
+      } catch (error) {
+
+        console.log(error);
+
+        if (!cancelled) {
+          setSimilarMovies([]);
+        }
+
+      } finally {
+
+        if (!cancelled) {
+          setSimilarLoading(false);
+        }
+      }
+    }
+
+    loadSimilar();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [movie?.id]);
 
   async function loadGenres() {
 
@@ -320,8 +391,9 @@ export default function MovieDetailScreen() {
 
             showsHorizontalScrollIndicator={false}
           >
-            {cast.slice(0, 10).map(
-              (actor: any) => (
+            {(cast ?? [])
+              .slice(0, 10)
+              .map((actor: any) => (
 
                 <View
                   key={actor.id}
@@ -367,6 +439,48 @@ export default function MovieDetailScreen() {
               )
             )}
           </ScrollView>
+
+          {similarLoading && (
+            <View
+              style={{
+                marginTop: 35,
+              }}
+            >
+              <Text
+                style={{
+                  color: '#FFFFFF',
+
+                  fontSize: 22,
+                  fontWeight: 'bold',
+
+                  marginBottom: 20,
+                }}
+              >
+                Similar Movies
+              </Text>
+
+              <View
+                style={{
+                  alignItems: 'center',
+
+                  paddingVertical: 28,
+                }}
+              >
+                <ActivityIndicator
+                  color="#4DA2FF"
+                  size="small"
+                />
+              </View>
+            </View>
+          )}
+
+          {!similarLoading &&
+            similarMovies.length > 0 && (
+              <MovieRow
+                title="Similar Movies"
+                movies={similarMovies}
+              />
+            )}
 
           {/* BUTTONS */}
 

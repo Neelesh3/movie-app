@@ -13,6 +13,10 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import {
+  useNavigation,
+} from '@react-navigation/native';
+
 type Props = {
   movies: any[];
 };
@@ -20,6 +24,9 @@ type Props = {
 export default function HeroBanner({
   movies,
 }: Props) {
+
+  const navigation: any =
+    useNavigation();
 
   const [currentIndex, setCurrentIndex] =
     useState(0);
@@ -124,6 +131,17 @@ export default function HeroBanner({
             }}
           >
             <TouchableOpacity
+              activeOpacity={0.85}
+
+              onPress={() =>
+                navigation.navigate(
+                  'Player',
+                  {
+                    movie,
+                  }
+                )
+              }
+
               style={{
                 backgroundColor: '#4DA2FF',
 
@@ -158,6 +176,17 @@ export default function HeroBanner({
             </TouchableOpacity>
 
             <TouchableOpacity
+              activeOpacity={0.85}
+
+              onPress={() =>
+                navigation.navigate(
+                  'MovieDetail',
+                  {
+                    movie,
+                  }
+                )
+              }
+
               style={{
                 backgroundColor:
                   'rgba(255,255,255,0.2)',

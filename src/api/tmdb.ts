@@ -62,18 +62,28 @@ export async function getUpcomingMovies() {
 
   return data.results;
 }
-export async function searchMovies(query: string) {
+export async function searchMovies(
+  query: string,
+  signal?: AbortSignal
+) {
 
   const response = await fetch(
-    `${BASE_URL}/search/movie?query=${query}`,
+    `${BASE_URL}/search/movie?query=${encodeURIComponent(
+      query
+    )}`,
     {
       headers,
+      signal,
     }
   );
 
+  if (!response.ok) {
+    return [];
+  }
+
   const data = await response.json();
 
-  return data.results;
+  return data.results ?? [];
 }
 
 export async function getMovieVideos(
@@ -120,4 +130,24 @@ export async function getMovieCredits(
   const data = await response.json();
 
   return data.cast;
+}
+
+export async function getSimilarMovies(
+  movieId: number
+) {
+
+  const response = await fetch(
+    `${BASE_URL}/movie/${movieId}/similar`,
+    {
+      headers,
+    }
+  );
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const data = await response.json();
+
+  return data.results ?? [];
 }
