@@ -1,0 +1,459 @@
+import { useEffect, useState } from 'react';
+
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { addToWatchlist } from '../services/watchlist';
+import {
+  getGenres,
+  getMovieCredits,
+} from '../api/tmdb';
+
+export default function MovieDetailScreen() {
+
+  const navigation: any = useNavigation();
+
+  const route: any = useRoute();
+
+  const { movie } = route.params;
+  const [genres, setGenres] =
+    useState<any[]>([]);
+
+  const [cast, setCast] =
+    useState<any[]>([]);
+
+  useEffect(() => {
+    loadGenres();
+    loadCast();
+  }, []);
+
+  async function loadGenres() {
+
+    try {
+
+      const data =
+        await getGenres();
+
+      setGenres(data);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function loadCast() {
+
+    try {
+
+      const data =
+        await getMovieCredits(movie.id);
+
+      setCast(data);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const movieGenres =
+    movie.genre_ids
+      ?.map((id: number) => {
+
+        const found =
+          genres.find(
+            (genre: any) =>
+              genre.id === id
+          );
+
+        return found?.name;
+      })
+      .filter(Boolean)
+      .join(' • ');
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#0B1020',
+      }}
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+      >
+        {/* BACKDROP */}
+
+        <View>
+          <Image
+            source={{
+              uri:
+                `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`,
+            }}
+
+            style={{
+              width: '100%',
+              height: 260,
+            }}
+          />
+
+          {/* BACK BUTTON */}
+
+          <TouchableOpacity
+            onPress={() =>
+              navigation.goBack()
+            }
+
+            style={{
+              position: 'absolute',
+              top: 50,
+              left: 20,
+
+              backgroundColor: 'rgba(0,0,0,0.5)',
+
+              width: 42,
+              height: 42,
+
+              borderRadius: 21,
+
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Ionicons
+              name="arrow-back"
+              size={22}
+              color="#FFFFFF"
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* CONTENT */}
+
+        <View
+          style={{
+            padding: 20,
+          }}
+        >
+          {/* TITLE */}
+
+          <Text
+            style={{
+              color: '#FFFFFF',
+              fontSize: 30,
+              fontWeight: 'bold',
+            }}
+          >
+            {movie.title}
+          </Text>
+
+          {/* RATING */}
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+
+              marginTop: 10,
+            }}
+          >
+            <Ionicons
+              name="star"
+              size={20}
+              color="#FFD700"
+            />
+
+            <Text
+              style={{
+                color: '#FFFFFF',
+                marginLeft: 6,
+                fontSize: 16,
+              }}
+            >
+              {movie.vote_average.toFixed(1)}
+            </Text>
+          </View>
+
+          {/* GENRES */}
+
+          <Text
+            style={{
+              color: '#4DA2FF',
+
+              marginTop: 14,
+
+              fontSize: 15,
+
+              fontWeight: '600',
+            }}
+          >
+            {movieGenres}
+          </Text>
+{/* META INFO */}
+
+<View
+  style={{
+    flexDirection: 'row',
+
+    alignItems: 'center',
+
+    marginTop: 18,
+
+    flexWrap: 'wrap',
+  }}
+>
+  {/* YEAR */}
+
+  <View
+    style={{
+      backgroundColor: '#151C2E',
+
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+
+      borderRadius: 20,
+
+      marginRight: 10,
+      marginBottom: 10,
+    }}
+  >
+    <Text
+      style={{
+        color: '#FFFFFF',
+        fontWeight: '600',
+      }}
+    >
+      {movie.release_date?.slice(0, 4)}
+    </Text>
+  </View>
+
+  {/* LANGUAGE */}
+
+  <View
+    style={{
+      backgroundColor: '#151C2E',
+
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+
+      borderRadius: 20,
+
+      marginRight: 10,
+      marginBottom: 10,
+    }}
+  >
+    <Text
+      style={{
+        color: '#FFFFFF',
+        fontWeight: '600',
+      }}
+    >
+      {movie.original_language?.toUpperCase()}
+    </Text>
+  </View>
+
+  {/* POPULARITY */}
+
+  <View
+    style={{
+      backgroundColor: '#151C2E',
+
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+
+      borderRadius: 20,
+
+      marginBottom: 10,
+    }}
+  >
+    <Text
+      style={{
+        color: '#FFFFFF',
+        fontWeight: '600',
+      }}
+    >
+      🔥 {Math.round(movie.popularity)}
+    </Text>
+  </View>
+</View>
+          {/* OVERVIEW */}
+
+          <Text
+            style={{
+              color: '#A8B3CF',
+
+              marginTop: 20,
+
+              lineHeight: 26,
+
+              fontSize: 15,
+            }}
+          >
+            {movie.overview}
+          </Text>
+
+          {/* CAST */}
+
+          <Text
+            style={{
+              color: '#FFFFFF',
+
+              fontSize: 22,
+              fontWeight: 'bold',
+
+              marginTop: 35,
+              marginBottom: 20,
+            }}
+          >
+            Cast
+          </Text>
+
+          <ScrollView
+            horizontal
+
+            showsHorizontalScrollIndicator={false}
+          >
+            {cast.slice(0, 10).map(
+              (actor: any) => (
+
+                <View
+                  key={actor.id}
+
+                  style={{
+                    alignItems: 'center',
+
+                    marginRight: 18,
+
+                    width: 80,
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri:
+                        `https://image.tmdb.org/t/p/w500${actor.profile_path}`,
+                    }}
+
+                    style={{
+                      width: 72,
+                      height: 72,
+
+                      borderRadius: 36,
+                    }}
+                  />
+
+                  <Text
+                    numberOfLines={2}
+
+                    style={{
+                      color: '#FFFFFF',
+
+                      fontSize: 12,
+
+                      textAlign: 'center',
+
+                      marginTop: 8,
+                    }}
+                  >
+                    {actor.name}
+                  </Text>
+                </View>
+              )
+            )}
+          </ScrollView>
+
+          {/* BUTTONS */}
+
+          <View
+            style={{
+              flexDirection: 'row',
+
+              marginTop: 30,
+
+              gap: 15,
+            }}
+          >
+            {/* WATCH NOW */}
+
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate(
+                  'Player',
+                  {
+                    movie,
+                  }
+                )
+              }
+              style={{
+                backgroundColor: '#4DA2FF',
+
+                flex: 1,
+
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+
+                paddingVertical: 16,
+
+                borderRadius: 50,
+              }}
+            >
+              <Ionicons
+                name="play"
+                size={22}
+                color="#FFFFFF"
+              />
+
+              <Text
+                style={{
+                  color: '#FFFFFF',
+                  marginLeft: 8,
+                  fontWeight: '600',
+                  fontSize: 16,
+                }}
+              >
+                Watch Now
+              </Text>
+            </TouchableOpacity>
+
+            {/* WATCHLIST */}
+
+            <TouchableOpacity
+
+              onPress={async () => {
+
+                await addToWatchlist(movie);
+
+                alert('Added to Watchlist ❤️');
+              }}
+
+              style={{
+                width: 60,
+                height: 60,
+
+                borderRadius: 30,
+
+                backgroundColor: '#151C2E',
+
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons
+                name="heart"
+                size={24}
+                color="#FF4D6D"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}

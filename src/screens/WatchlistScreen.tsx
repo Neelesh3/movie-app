@@ -1,0 +1,247 @@
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+import {
+  useNavigation,
+} from '@react-navigation/native';
+
+import {
+  getWatchlist,
+} from '../services/watchlist';
+
+export default function WatchlistScreen() {
+
+  const navigation: any = useNavigation();
+
+  const [movies, setMovies] =
+    useState<any[]>([]);
+
+  useEffect(() => {
+    loadWatchlist();
+  }, []);
+
+  async function loadWatchlist() {
+
+    const data =
+      await getWatchlist();
+
+    setMovies(data);
+  }
+
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#0B1020',
+      }}
+    >
+      {/* HEADER */}
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+
+          paddingHorizontal: 20,
+          paddingTop: 10,
+          paddingBottom: 20,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() =>
+            navigation.goBack()
+          }
+        >
+          <Ionicons
+            name="arrow-back"
+            size={26}
+            color="#FFFFFF"
+          />
+        </TouchableOpacity>
+
+        <Text
+          style={{
+            color: '#FFFFFF',
+
+            fontSize: 28,
+            fontWeight: 'bold',
+
+            marginLeft: 18,
+          }}
+        >
+          My Watchlist
+        </Text>
+      </View>
+
+      {/* EMPTY */}
+
+      {movies.length === 0 ? (
+        <View
+          style={{
+            flex: 1,
+
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Ionicons
+            name="heart-outline"
+            size={70}
+            color="#4DA2FF"
+          />
+
+          <Text
+            style={{
+              color: '#FFFFFF',
+
+              fontSize: 22,
+              fontWeight: 'bold',
+
+              marginTop: 20,
+            }}
+          >
+            No Saved Movies
+          </Text>
+
+          <Text
+            style={{
+              color: '#A8B3CF',
+
+              marginTop: 10,
+            }}
+          >
+            Add movies to your watchlist
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={movies}
+
+          keyExtractor={(item, index) =>
+            index.toString()
+          }
+
+          contentContainerStyle={{
+            padding: 20,
+            paddingBottom: 120,
+          }}
+
+          renderItem={({ item }) => (
+            <TouchableOpacity
+
+              activeOpacity={0.85}
+
+              onPress={() =>
+                navigation.navigate(
+                  'MovieDetail',
+                  {
+                    movie: item,
+                  }
+                )
+              }
+
+              style={{
+                flexDirection: 'row',
+
+                marginBottom: 18,
+
+                backgroundColor: '#151C2E',
+
+                borderRadius: 20,
+
+                overflow: 'hidden',
+              }}
+            >
+              {/* POSTER */}
+
+              <Image
+                source={{
+                  uri:
+                    `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+                }}
+
+                style={{
+                  width: 110,
+                  height: 160,
+                }}
+              />
+
+              {/* INFO */}
+
+              <View
+                style={{
+                  flex: 1,
+                  padding: 15,
+                }}
+              >
+                <Text
+                  numberOfLines={2}
+
+                  style={{
+                    color: '#FFFFFF',
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {item.title}
+                </Text>
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+
+                    marginTop: 10,
+                  }}
+                >
+                  <Ionicons
+                    name="star"
+                    size={16}
+                    color="#FFD700"
+                  />
+
+                  <Text
+                    style={{
+                      color: '#FFFFFF',
+                      marginLeft: 6,
+                    }}
+                  >
+                    {item.vote_average?.toFixed(1)}
+                  </Text>
+                </View>
+
+                <Text
+                  numberOfLines={4}
+
+                  style={{
+                    color: '#A8B3CF',
+
+                    marginTop: 12,
+
+                    lineHeight: 22,
+                  }}
+                >
+                  {item.overview}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
+    </SafeAreaView>
+  );
+}
