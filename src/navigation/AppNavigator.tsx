@@ -13,6 +13,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import DownloadsScreen from '../screens/DownloadsScreen';
 import MovieDetailScreen from '../screens/MovieDetailScreen';
 import PlayerScreen from '../screens/PlayerScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
@@ -58,6 +59,8 @@ function BottomTabs() {
             iconName = 'home';
           } else if (route.name === 'Search') {
             iconName = 'search';
+          } else if (route.name === 'Downloads') {
+            iconName = 'download';
           } else if (route.name === 'Profile') {
             iconName = 'person';
           }
@@ -80,6 +83,11 @@ function BottomTabs() {
       <Tab.Screen
         name="Search"
         component={SearchScreen}
+      />
+
+      <Tab.Screen
+        name="Downloads"
+        component={DownloadsScreen}
       />
 
       <Tab.Screen

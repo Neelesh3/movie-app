@@ -22,9 +22,17 @@ import AppNavigator from './src/navigation/AppNavigator';
 
 import CineBluishSplash from './src/components/CineBluishSplash';
 
+import OfflineBanner from './src/components/OfflineBanner';
+
+import DownloadTicker from './src/components/DownloadTicker';
+
 import {
   ThemeProvider,
 } from './src/context/ThemeContext';
+
+import {
+  NetworkProvider,
+} from './src/context/NetworkContext';
 
 import {
   getOnboardingComplete,
@@ -33,6 +41,10 @@ import {
 import {
   useWatchlistStore,
 } from './src/stores/watchlistStore';
+
+import {
+  useDownloadStore,
+} from './src/stores/downloadStore';
 
 function AppNavigationRoot() {
 
@@ -56,9 +68,13 @@ function AppNavigationRoot() {
 
       try {
 
-        const [, done] =
+        const [, , done] =
           await Promise.all([
             useWatchlistStore
+              .getState()
+              .hydrate(),
+
+            useDownloadStore
               .getState()
               .hydrate(),
 
@@ -74,6 +90,11 @@ function AppNavigationRoot() {
 
         if (!cancelled) {
           await useWatchlistStore
+            .getState()
+            .hydrate()
+            .catch(() => {});
+
+          await useDownloadStore
             .getState()
             .hydrate()
             .catch(() => {});
@@ -134,7 +155,11 @@ export default function App() {
       style={{ flex: 1 }}
     >
       <ThemeProvider>
-        <AppNavigationRoot />
+        <NetworkProvider>
+          <AppNavigationRoot />
+          <OfflineBanner />
+          <DownloadTicker />
+        </NetworkProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );

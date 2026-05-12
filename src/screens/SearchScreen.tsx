@@ -8,7 +8,6 @@ import {
   Text,
   TextInput,
   FlatList,
-  Image,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
@@ -32,6 +31,8 @@ import {
 } from '../stores/watchlistStore';
 
 import PressScale from '../components/PressScale';
+
+import FadeInImage from '../components/FadeInImage';
 
 const DEBOUNCE_MS = 500;
 
@@ -469,10 +470,18 @@ export default function SearchScreen() {
 
         extraData={watchlistItems}
 
+        initialNumToRender={8}
+
+        maxToRenderPerBatch={8}
+
         contentContainerStyle={{
           padding: 20,
           paddingBottom: 120,
         }}
+
+        updateCellsBatchingPeriod={32}
+
+        windowSize={7}
 
         renderItem={({ item }) => {
 
@@ -513,11 +522,15 @@ export default function SearchScreen() {
           >
             {/* POSTER */}
 
-            <Image
+            <FadeInImage
               source={{
                 uri:
                   `https://image.tmdb.org/t/p/w500${item.poster_path}`,
               }}
+
+              placeholderColor={
+                colors.surface
+              }
 
               style={{
                 width: 110,

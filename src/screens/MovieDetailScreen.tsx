@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  Image,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
@@ -15,6 +14,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import MovieRow from '../components/MovieRow';
+import FadeInImage from '../components/FadeInImage';
+import DownloadActionButton from '../components/DownloadActionButton';
 
 import {
   useWatchlistStore,
@@ -184,11 +185,15 @@ export default function MovieDetailScreen() {
         {/* BACKDROP */}
 
         <View>
-          <Image
+          <FadeInImage
             source={{
               uri:
                 `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`,
             }}
+
+            fadeDurationMs={320}
+
+            placeholderColor="#020814"
 
             style={{
               width: '100%',
@@ -429,11 +434,15 @@ export default function MovieDetailScreen() {
                     width: 80,
                   }}
                 >
-                  <Image
+                  <FadeInImage
                     source={{
                       uri:
                         `https://image.tmdb.org/t/p/w500${actor.profile_path}`,
                     }}
+
+                    placeholderColor={
+                      colors.surface
+                    }
 
                     style={{
                       width: 72,
@@ -599,6 +608,12 @@ export default function MovieDetailScreen() {
                 }
               />
             </PressScale>
+
+            {/* DOWNLOAD */}
+
+            <DownloadActionButton
+              movie={movie}
+            />
           </View>
         </View>
       </ScrollView>

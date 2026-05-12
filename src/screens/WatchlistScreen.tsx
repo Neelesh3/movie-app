@@ -4,7 +4,6 @@ import {
   View,
   Text,
   FlatList,
-  Image,
   TouchableOpacity,
 } from 'react-native';
 
@@ -23,6 +22,8 @@ import {
 import {
   useWatchlistStore,
 } from '../stores/watchlistStore';
+
+import FadeInImage from '../components/FadeInImage';
 
 export default function WatchlistScreen() {
 
@@ -126,10 +127,18 @@ export default function WatchlistScreen() {
             String(item.id)
           }
 
+          initialNumToRender={8}
+
+          maxToRenderPerBatch={8}
+
           contentContainerStyle={{
             padding: 20,
             paddingBottom: 120,
           }}
+
+          updateCellsBatchingPeriod={32}
+
+          windowSize={7}
 
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -163,11 +172,15 @@ export default function WatchlistScreen() {
             >
               {/* POSTER */}
 
-              <Image
+              <FadeInImage
                 source={{
                   uri:
                     `https://image.tmdb.org/t/p/w500${item.poster_path}`,
                 }}
+
+                placeholderColor={
+                  colors.surface
+                }
 
                 style={{
                   width: 110,

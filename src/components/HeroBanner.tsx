@@ -7,8 +7,8 @@ import React, {
 import {
   View,
   Text,
-  ImageBackground,
   Animated,
+  Easing,
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -23,6 +23,8 @@ import YoutubePlayer from 'react-native-youtube-iframe';
 
 import PressScale from './PressScale';
 
+import FadeInImage from './FadeInImage';
+
 import {
   getMovieVideos,
 } from '../api/tmdb';
@@ -31,7 +33,7 @@ type Props = {
   movies: any[];
 };
 
-export default function HeroBanner({
+function HeroBanner({
   movies,
 }: Props) {
 
@@ -48,6 +50,11 @@ export default function HeroBanner({
     setTrailerKey,
   ] = useState('');
 
+  const [
+    isTrailerReady,
+    setIsTrailerReady,
+  ] = useState(false);
+
   const scaleAnim =
     useRef(
       new Animated.Value(1)
@@ -57,6 +64,16 @@ export default function HeroBanner({
   useRef(
     new Animated.Value(0)
   ).current;
+
+  const trailerFadeAnim =
+    useRef(
+      new Animated.Value(0)
+    ).current;
+
+  const loadingPulseAnim =
+    useRef(
+      new Animated.Value(0)
+    ).current;
 
 
   /* AUTO SLIDER */
@@ -88,6 +105,14 @@ export default function HeroBanner({
 
   useEffect(() => {
 
+    let cancelled = false;
+
+    setIsTrailerReady(false);
+
+    trailerFadeAnim.setValue(0);
+
+    setTrailerKey('');
+
     async function loadTrailer() {
 
       try {
@@ -96,6 +121,8 @@ export default function HeroBanner({
           movies[currentIndex];
 
         if (!movie?.id) {
+          setTrailerKey('');
+
           return;
         }
 
@@ -113,16 +140,28 @@ export default function HeroBanner({
 
         if (trailer?.key) {
 
+          if (cancelled) {
+            return;
+          }
+
           setTrailerKey(
             trailer.key
           );
 
         } else {
 
+          if (cancelled) {
+            return;
+          }
+
           setTrailerKey('');
         }
 
       } catch (error) {
+
+        if (cancelled) {
+          return;
+        }
 
         console.log(error);
 
@@ -131,6 +170,10 @@ export default function HeroBanner({
     }
 
     loadTrailer();
+
+    return () => {
+      cancelled = true;
+    };
 
   }, [currentIndex, movies]);
 
@@ -168,6 +211,59 @@ export default function HeroBanner({
 
   }, []);
 
+  /* TRAILER LOADING PULSE */
+
+  useEffect(() => {
+
+    if (!trailerKey ||
+      isTrailerReady) {
+      return;
+    }
+
+    const pulse =
+      Animated.loop(
+        Animated.sequence([
+
+          Animated.timing(
+            loadingPulseAnim,
+            {
+              toValue: 1,
+
+              duration: 1400,
+
+              easing:
+                Easing.inOut(
+                  Easing.ease
+                ),
+
+              useNativeDriver: true,
+            }
+          ),
+
+          Animated.timing(
+            loadingPulseAnim,
+            {
+              toValue: 0,
+
+              duration: 1400,
+
+              easing:
+                Easing.inOut(
+                  Easing.ease
+                ),
+
+              useNativeDriver: true,
+            }
+          ),
+        ])
+      );
+
+    pulse.start();
+
+    return () => pulse.stop();
+
+  }, [trailerKey, isTrailerReady]);
+
   useEffect(() => {
 
   fadeAnim.setValue(0);
@@ -184,6 +280,27 @@ export default function HeroBanner({
   ).start();
 
 }, [currentIndex]);
+
+  function handleTrailerReady() {
+
+    setIsTrailerReady(true);
+
+    Animated.timing(
+      trailerFadeAnim,
+      {
+        toValue: 1,
+
+        duration: 900,
+
+        easing:
+          Easing.out(
+            Easing.cubic
+          ),
+
+        useNativeDriver: true,
+      }
+    ).start();
+  }
 
 
   const movie =
@@ -208,41 +325,195 @@ export default function HeroBanner({
     >
       {/* VIDEO PREVIEW */}
 
+      <FadeInImage
+        source={{
+          uri:
+            `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`,
+        }}
+
+        fadeDurationMs={360}
+
+        placeholderColor="#020814"
+
+        style={{
+          height: 520,
+
+          backgroundColor:
+            '#020814',
+        }}
+      />
+
       {trailerKey ? (
 
-        <YoutubePlayer
-          height={520}
-
-          play
-
-          mute
-
-          initialPlayerParams={{
-            controls: false,
-
-            modestbranding: true,
-
-            rel: false,
-
-            loop: true,
-          }}
-
-          videoId={trailerKey}
-        />
-
-      ) : (
-
-        <ImageBackground
-          source={{
-            uri:
-              `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`,
-          }}
+        <Animated.View
+          key={trailerKey}
 
           style={{
+            position: 'absolute',
+
+            top: 0,
+            left: 0,
+            right: 0,
+
+            height: 520,
+
+            opacity:
+              trailerFadeAnim,
+
+            backgroundColor:
+              'transparent',
+          }}
+        >
+          <YoutubePlayer
+            height={520}
+
+            play
+
+            mute
+
+            initialPlayerParams={{
+              controls: false,
+
+              modestbranding: true,
+
+              rel: false,
+
+              loop: true,
+            }}
+
+            onReady={
+              handleTrailerReady
+            }
+
+            videoId={trailerKey}
+          />
+        </Animated.View>
+
+      ) : null}
+
+      {trailerKey &&
+        !isTrailerReady ? (
+
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+
+            top: 0,
+            left: 0,
+            right: 0,
+
             height: 520,
           }}
-        />
-      )}
+        >
+          <LinearGradient
+            colors={[
+              'rgba(2,8,20,0.22)',
+              'rgba(2,8,20,0.48)',
+              'rgba(0,0,0,0.92)',
+            ]}
+
+            style={{
+              position: 'absolute',
+
+              width: '100%',
+              height: '100%',
+            }}
+          />
+
+          <View
+            style={{
+              position: 'absolute',
+
+              left: 20,
+              right: 20,
+              bottom: 168,
+            }}
+          >
+            <Animated.View
+              style={{
+                width: 52,
+                height: 52,
+
+                borderRadius: 26,
+
+                alignItems: 'center',
+                justifyContent: 'center',
+
+                backgroundColor:
+                  'rgba(77,162,255,0.18)',
+
+                borderWidth: 1,
+
+                borderColor:
+                  'rgba(255,255,255,0.18)',
+
+                opacity:
+                  loadingPulseAnim.interpolate({
+                    inputRange: [0, 1],
+
+                    outputRange: [0.55, 1],
+                  }),
+              }}
+            >
+              <Ionicons
+                name="play"
+
+                size={22}
+
+                color="#FFFFFF"
+              />
+            </Animated.View>
+
+            <View
+              style={{
+                width: 140,
+                height: 3,
+
+                borderRadius: 3,
+
+                marginTop: 18,
+
+                overflow: 'hidden',
+
+                backgroundColor:
+                  'rgba(255,255,255,0.16)',
+              }}
+            >
+              <Animated.View
+                style={{
+                  width: '58%',
+                  height: '100%',
+
+                  borderRadius: 3,
+
+                  backgroundColor:
+                    '#4DA2FF',
+
+                  opacity:
+                    loadingPulseAnim.interpolate({
+                      inputRange: [0, 1],
+
+                      outputRange: [0.45, 0.95],
+                    }),
+
+                  transform: [
+                    {
+                      translateX:
+                        loadingPulseAnim.interpolate({
+                          inputRange: [0, 1],
+
+                          outputRange: [-60, 110],
+                        }),
+                    },
+                  ],
+                }}
+              />
+            </View>
+          </View>
+        </View>
+
+      ) : null}
 
       {/* OVERLAY */}
 
@@ -573,3 +844,5 @@ export default function HeroBanner({
     </Animated.View>
   );
 }
+
+export default React.memo(HeroBanner);

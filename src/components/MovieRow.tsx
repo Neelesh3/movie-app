@@ -1,4 +1,6 @@
-import React from 'react';
+import React, {
+  useCallback,
+} from 'react';
 
 import {
   View,
@@ -17,12 +19,39 @@ interface Props {
   movies: any[];
 }
 
-export default function MovieRow({
+function MovieRow({
   title,
   movies,
 }: Props) {
 
   const { colors } = useTheme();
+
+  const keyExtractor =
+    useCallback((
+      item: any,
+      index: number
+    ) =>
+      item?.id
+        ? item.id.toString()
+        : index.toString(),
+    []);
+
+  const getItemLayout =
+    useCallback((
+      _data: any,
+      index: number
+    ) => ({
+      length: 156,
+      offset: 156 * index,
+      index,
+    }), []);
+
+  const renderMovie =
+    useCallback(({ item }: {
+      item: any;
+    }) => (
+      <MovieCard movie={item} />
+    ), []);
 
   return (
     <View
@@ -68,15 +97,21 @@ export default function MovieRow({
 
         data={movies}
 
-        keyExtractor={(item, index) =>
-          index.toString()
-        }
+        keyExtractor={keyExtractor}
 
-        renderItem={({ item }) => (
-          <MovieCard movie={item} />
-        )}
+        renderItem={renderMovie}
+
+        getItemLayout={getItemLayout}
+
+        initialNumToRender={6}
+
+        maxToRenderPerBatch={6}
 
         showsHorizontalScrollIndicator={false}
+
+        updateCellsBatchingPeriod={32}
+
+        windowSize={5}
 
         contentContainerStyle={{
           paddingLeft: 20,
@@ -85,3 +120,5 @@ export default function MovieRow({
     </View>
   );
 }
+
+export default React.memo(MovieRow);

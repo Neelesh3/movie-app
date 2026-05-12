@@ -1,5 +1,11 @@
 import { TMDB_TOKEN } from '@env';
 
+import {
+  resultsFromResponse,
+  safeArray,
+  safeRequest,
+} from './request';
+
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 const headers = {
@@ -7,174 +13,134 @@ const headers = {
   accept: 'application/json',
 };
 
-export async function getTrendingMovies() {
+function tmdbUrl(
+  path: string
+) {
 
-  const response = await fetch(
-    `${BASE_URL}/trending/movie/week`,
+  return `${BASE_URL}${path}`;
+}
+
+function getResults(
+  path: string,
+  label: string,
+  signal?: AbortSignal
+) {
+
+  return safeRequest<any[]>(
+    tmdbUrl(path),
     {
+      fallback: [],
       headers,
+      label,
+      parse:
+        resultsFromResponse,
+      signal,
     }
   );
+}
 
-  const data = await response.json();
+export async function getTrendingMovies() {
 
-  return data.results;
+  return getResults(
+    '/trending/movie/week',
+    'getTrendingMovies'
+  );
 }
 
 export async function getTopRatedMovies() {
 
-  const response = await fetch(
-    `${BASE_URL}/movie/top_rated`,
-    {
-      headers,
-    }
+  return getResults(
+    '/movie/top_rated',
+    'getTopRatedMovies'
   );
-
-  const data = await response.json();
-
-  return data.results;
 }
 
 export async function getPopularMovies() {
 
-  const response = await fetch(
-    `${BASE_URL}/movie/popular`,
-    {
-      headers,
-    }
+  return getResults(
+    '/movie/popular',
+    'getPopularMovies'
   );
-
-  const data = await response.json();
-
-  return data.results;
 }
 
 export async function getUpcomingMovies() {
 
-  const response = await fetch(
-    `${BASE_URL}/movie/upcoming`,
-    {
-      headers,
-    }
+  return getResults(
+    '/movie/upcoming',
+    'getUpcomingMovies'
   );
-
-  const data = await response.json();
-
-  return data.results;
 }
+
 export async function searchMovies(
   query: string,
   signal?: AbortSignal
 ) {
 
-  const response = await fetch(
-    `${BASE_URL}/search/movie?query=${encodeURIComponent(
+  return getResults(
+    `/search/movie?query=${encodeURIComponent(
       query
     )}`,
-    {
-      headers,
-      signal,
-    }
+    'searchMovies',
+    signal
   );
-
-  if (!response.ok) {
-    return [];
-  }
-
-  const data = await response.json();
-
-  return data.results ?? [];
 }
 
 export async function getMovieVideos(
   movieId: number
 ) {
 
-  const response = await fetch(
-    `${BASE_URL}/movie/${movieId}/videos`,
-    {
-      headers,
-    }
+  return getResults(
+    `/movie/${movieId}/videos`,
+    'getMovieVideos'
   );
-
-  const data = await response.json();
-
-  return data.results;
 }
 
 export async function getGenres() {
 
-  const response = await fetch(
-    `${BASE_URL}/genre/movie/list`,
+  return safeRequest<any[]>(
+    tmdbUrl('/genre/movie/list'),
     {
+      fallback: [],
       headers,
+      label: 'getGenres',
+      parse: (data) =>
+        safeArray(data?.genres),
     }
   );
-
-  const data = await response.json();
-
-  return data.genres;
 }
 
 export async function getMovieCredits(
   movieId: number
 ) {
 
-  const response = await fetch(
-    `${BASE_URL}/movie/${movieId}/credits`,
+  return safeRequest<any[]>(
+    tmdbUrl(`/movie/${movieId}/credits`),
     {
+      fallback: [],
       headers,
+      label: 'getMovieCredits',
+      parse: (data) =>
+        safeArray(data?.cast),
     }
   );
-
-  const data = await response.json();
-
-  return data.cast;
 }
 
 export async function getSimilarMovies(
   movieId: number
 ) {
 
-  const response = await fetch(
-    `${BASE_URL}/movie/${movieId}/similar`,
-    {
-      headers,
-    }
+  return getResults(
+    `/movie/${movieId}/similar`,
+    'getSimilarMovies'
   );
-
-  if (!response.ok) {
-    return [];
-  }
-
-  const data = await response.json();
-
-  return data.results ?? [];
 }
 
 export async function getMoviesByGenre(
   genreId: number
 ) {
 
-  try {
-
-    const response =
-      await fetch(
-        `https://api.themoviedb.org/3/discover/movie?with_genres=${genreId}`,
-         {
-    headers,
-  }
-      );
-
-    const data =
-      await response.json();
-
-    return data.results || [];
-
-  } catch (error) {
-
-    console.log(error);
-
-    return [];
-  }
+  return getResults(
+    `/discover/movie?with_genres=${genreId}`,
+    'getMoviesByGenre'
+  );
 }

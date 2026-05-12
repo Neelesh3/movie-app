@@ -1,11 +1,12 @@
-import React from 'react';
+import React, {
+  useCallback,
+} from 'react';
 
 import { useNavigation } from '@react-navigation/native';
 
 import {
   View,
   Text,
-  Image,
 } from 'react-native';
 
 import {
@@ -14,11 +15,13 @@ import {
 
 import PressScale from './PressScale';
 
+import FadeInImage from './FadeInImage';
+
 interface MovieCardProps {
   movie: any;
 }
 
-export default function MovieCard({
+function MovieCard({
   movie,
 }: MovieCardProps) {
 
@@ -26,20 +29,32 @@ export default function MovieCard({
 
   const { colors } = useTheme();
 
+  const handlePress =
+    useCallback(() => {
+
+      if (!movie) {
+        return;
+      }
+
+      navigation.navigate(
+        'MovieDetail',
+        {
+          movie,
+        }
+      );
+
+    }, [navigation, movie]);
+
   if (!movie) {
     return null;
   }
 
+  const posterUri =
+    `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+
   return (
     <PressScale
-      onPress={() =>
-        navigation.navigate(
-          'MovieDetail',
-          {
-            movie,
-          }
-        )
-      }
+      onPress={handlePress}
       style={{
         marginRight: 16,
         width: 140,
@@ -57,10 +72,14 @@ export default function MovieCard({
           borderColor: colors.borderSubtle,
         }}
       >
-        <Image
+        <FadeInImage
           source={{
-            uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+            uri: posterUri,
           }}
+
+          placeholderColor={
+            colors.surface
+          }
 
           style={{
             width: '100%',
@@ -93,3 +112,5 @@ export default function MovieCard({
     </PressScale>
   );
 }
+
+export default React.memo(MovieCard);

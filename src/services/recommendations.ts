@@ -10,6 +10,58 @@ import {
   getMoviesByGenre,
 } from '../api/tmdb';
 
+import {
+  safeArray,
+} from '../api/request';
+
+function getGenreIds(
+  movie: any
+) {
+
+  return safeArray<number>(
+    movie?.genre_ids
+  );
+}
+
+function getTopGenres(
+  movies: any[],
+  limit?: number
+) {
+
+  const genreMap:
+    Record<number, number> = {};
+
+  movies.forEach(
+    (movie: any) => {
+
+      getGenreIds(movie).forEach(
+        (genreId: number) => {
+
+          genreMap[genreId] =
+            (genreMap[genreId] || 0) + 1;
+        }
+      );
+    }
+  );
+
+  const genres =
+    Object.entries(genreMap)
+
+      .sort(
+        (a, b) =>
+          b[1] - a[1]
+      )
+
+      .map(
+        ([genreId]) =>
+          Number(genreId)
+      );
+
+  return typeof limit === 'number'
+    ? genres.slice(0, limit)
+    : genres;
+}
+
 export async function getRecommendedMovies() {
 
   try {
@@ -21,42 +73,16 @@ export async function getRecommendedMovies() {
       await getContinueWatching();
 
     const combined = [
-      ...watchlist,
-      ...continueWatching,
+      ...safeArray(watchlist),
+      ...safeArray(continueWatching),
     ];
 
     if (!combined.length) {
       return [];
     }
 
-    const genreMap:
-      Record<number, number> = {};
-
-    combined.forEach(
-      (movie: any) => {
-
-        movie.genre_ids?.forEach(
-          (genreId: number) => {
-
-            genreMap[genreId] =
-              (genreMap[genreId] || 0) + 1;
-          }
-        );
-      }
-    );
-
     const sortedGenres =
-      Object.entries(genreMap)
-
-        .sort(
-          (a, b) =>
-            b[1] - a[1]
-        )
-
-        .map(
-          ([genreId]) =>
-            Number(genreId)
-        );
+      getTopGenres(combined);
 
     const topGenre =
       sortedGenres[0];
@@ -92,39 +118,14 @@ export async function getFavoriteGenres() {
       await getContinueWatching();
 
     const combined = [
-      ...watchlist,
-      ...continueWatching,
+      ...safeArray(watchlist),
+      ...safeArray(continueWatching),
     ];
 
-    const genreMap:
-      Record<number, number> = {};
-
-    combined.forEach(
-      (movie: any) => {
-
-        movie.genre_ids?.forEach(
-          (genreId: number) => {
-
-            genreMap[genreId] =
-              (genreMap[genreId] || 0) + 1;
-          }
-        );
-      }
+    return getTopGenres(
+      combined,
+      3
     );
-
-    return Object.entries(genreMap)
-
-      .sort(
-        (a, b) =>
-          b[1] - a[1]
-      )
-
-      .map(
-        ([genreId]) =>
-          Number(genreId)
-      )
-
-      .slice(0, 3);
 
   } catch (error) {
 

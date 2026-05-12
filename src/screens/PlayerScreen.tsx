@@ -36,6 +36,8 @@ import {
   useTheme,
 } from '../context/ThemeContext';
 
+import DownloadActionButton from '../components/DownloadActionButton';
+
 export default function PlayerScreen() {
 
   const navigation: any = useNavigation();
@@ -278,6 +280,18 @@ export default function PlayerScreen() {
           </TouchableOpacity>
 
         ) : null}
+
+        <View
+          style={{
+            marginTop: 16,
+            alignItems: 'flex-start',
+          }}
+        >
+          <DownloadActionButton
+            movie={movie}
+            variant="wide"
+          />
+        </View>
 
         <View
           style={{

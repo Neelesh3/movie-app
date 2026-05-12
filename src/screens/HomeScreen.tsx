@@ -1,5 +1,6 @@
 import React, {
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 
@@ -50,6 +51,15 @@ import {
 } from '../services/continueWatching';
 
 import TopTenRow from '../components/TopTenRow';
+
+const categoryFilters = [
+  'Movies',
+  'Trending',
+  'Action',
+  'Sci-Fi',
+  'Drama',
+  'Thriller',
+];
 
 export default function HomeScreen() {
 
@@ -247,6 +257,138 @@ export default function HomeScreen() {
     setRefreshing(false);
   }
 
+  const categoryFilterContent =
+    useMemo(() => (
+
+      categoryFilters.map((item, index) => (
+
+        <View
+          key={index}
+
+          style={{
+            backgroundColor:
+              index === 0
+                ? '#4DA2FF'
+                : 'rgba(255,255,255,0.08)',
+
+            paddingHorizontal: 20,
+
+            paddingVertical: 12,
+
+            borderRadius: 28,
+
+            marginRight: 12,
+          }}
+        >
+          <Text
+            style={{
+              color: '#FFFFFF',
+
+              fontWeight: '600',
+            }}
+          >
+            {item}
+          </Text>
+        </View>
+      ))
+
+    ), []);
+
+  const movieRowsContent =
+    useMemo(() => {
+
+      if (loading) {
+
+        return (
+          <View
+            style={{
+              marginTop: 35,
+
+              paddingLeft: 20,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+              }}
+            >
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </View>
+          </View>
+        );
+      }
+
+      return (
+        <>
+
+          {continueWatching.length > 0 && (
+
+            <MovieRow
+              title="Continue Watching"
+              movies={
+                continueWatching
+              }
+            />
+          )}
+
+          {recommendedMovies.length > 0 && (
+
+            <MovieRow
+              title="Recommended For You"
+              movies={
+                recommendedMovies
+              }
+            />
+          )}
+          {genreRows.map((row, index) => (
+
+            <MovieRow
+              key={index}
+
+              title={row.title}
+
+              movies={row.movies}
+            />
+          ))}
+          <TopTenRow
+            movies={trendingMovies}
+          />
+          <MovieRow
+            title="Trending Now"
+            movies={trendingMovies}
+          />
+
+          <MovieRow
+            title="Top Rated"
+            movies={topRatedMovies}
+          />
+
+          <MovieRow
+            title="Popular Movies"
+            movies={popularMovies}
+          />
+
+          <MovieRow
+            title="Upcoming Releases"
+            movies={upcomingMovies}
+          />
+
+        </>
+      );
+
+    }, [
+      continueWatching,
+      genreRows,
+      loading,
+      popularMovies,
+      recommendedMovies,
+      topRatedMovies,
+      trendingMovies,
+      upcomingMovies,
+    ]);
+
   return (
     <SafeAreaView
       style={{
@@ -421,125 +563,10 @@ export default function HomeScreen() {
             marginTop: 24,
           }}
         >
-          {[
-            'Movies',
-            'Trending',
-            'Action',
-            'Sci-Fi',
-            'Drama',
-            'Thriller',
-          ].map((item, index) => (
-
-            <View
-              key={index}
-
-              style={{
-                backgroundColor:
-                  index === 0
-                    ? '#4DA2FF'
-                    : 'rgba(255,255,255,0.08)',
-
-                paddingHorizontal: 20,
-
-                paddingVertical: 12,
-
-                borderRadius: 28,
-
-                marginRight: 12,
-              }}
-            >
-              <Text
-                style={{
-                  color: '#FFFFFF',
-
-                  fontWeight: '600',
-                }}
-              >
-                {item}
-              </Text>
-            </View>
-          ))}
+          {categoryFilterContent}
         </ScrollView>
 
-        {loading ? (
-
-          <View
-            style={{
-              marginTop: 35,
-
-              paddingLeft: 20,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-              }}
-            >
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-            </View>
-          </View>
-
-        ) : (
-
-          <>
-
-            {continueWatching.length > 0 && (
-
-              <MovieRow
-                title="Continue Watching"
-                movies={
-                  continueWatching
-                }
-              />
-            )}
-
-            {recommendedMovies.length > 0 && (
-
-              <MovieRow
-                title="Recommended For You"
-                movies={
-                  recommendedMovies
-                }
-              />
-            )}
-            {genreRows.map((row, index) => (
-
-              <MovieRow
-                key={index}
-
-                title={row.title}
-
-                movies={row.movies}
-              />
-            ))}
-            <TopTenRow
-              movies={trendingMovies}
-            />
-            <MovieRow
-              title="Trending Now"
-              movies={trendingMovies}
-            />
-
-            <MovieRow
-              title="Top Rated"
-              movies={topRatedMovies}
-            />
-
-            <MovieRow
-              title="Popular Movies"
-              movies={popularMovies}
-            />
-
-            <MovieRow
-              title="Upcoming Releases"
-              movies={upcomingMovies}
-            />
-
-          </>
-
-        )}
+        {movieRowsContent}
 
       </ScrollView>
     </SafeAreaView>
