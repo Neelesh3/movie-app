@@ -23,8 +23,20 @@ import MovieRow from '../components/MovieRow';
 import SkeletonCard from '../components/SkeletonCard';
 
 import {
+  getRecommendedMovies,
+} from '../services/recommendations';
+
+import {
   useTheme,
 } from '../context/ThemeContext';
+
+import {
+  getFavoriteGenres,
+} from '../services/recommendations';
+
+import {
+  getMoviesByGenre,
+} from '../api/tmdb';
 
 import {
   getTrendingMovies,
@@ -37,6 +49,8 @@ import {
   getContinueWatching,
 } from '../services/continueWatching';
 
+import TopTenRow from '../components/TopTenRow';
+
 export default function HomeScreen() {
 
   const {
@@ -44,20 +58,41 @@ export default function HomeScreen() {
     colors,
   } = useTheme();
 
-  const [trendingMovies, setTrendingMovies] =
-    useState<any[]>([]);
+  const [
+    trendingMovies,
+    setTrendingMovies,
+  ] = useState<any[]>([]);
 
-  const [heroMovies, setHeroMovies] =
-    useState<any[]>([]);
+  const [
+    recommendedMovies,
+    setRecommendedMovies,
+  ] = useState<any[]>([]);
 
-  const [topRatedMovies, setTopRatedMovies] =
-    useState<any[]>([]);
 
-  const [popularMovies, setPopularMovies] =
-    useState<any[]>([]);
+  const [
+    genreRows,
+    setGenreRows,
+  ] = useState<any[]>([]);
 
-  const [upcomingMovies, setUpcomingMovies] =
-    useState<any[]>([]);
+  const [
+    heroMovies,
+    setHeroMovies,
+  ] = useState<any[]>([]);
+
+  const [
+    topRatedMovies,
+    setTopRatedMovies,
+  ] = useState<any[]>([]);
+
+  const [
+    popularMovies,
+    setPopularMovies,
+  ] = useState<any[]>([]);
+
+  const [
+    upcomingMovies,
+    setUpcomingMovies,
+  ] = useState<any[]>([]);
 
   const [
     continueWatching,
@@ -71,7 +106,57 @@ export default function HomeScreen() {
     useState(false);
 
   useEffect(() => {
+
     loadMovies();
+
+    loadRecommendedMovies();
+    async function loadGenreRows() {
+
+      try {
+
+        const favoriteGenres =
+          await getFavoriteGenres();
+
+        const genreMap: any = {
+          28: 'Because You Like Action',
+          35: 'Comedy Picks',
+          27: 'Horror Nights',
+          878: 'Sci-Fi Universe',
+          53: 'Thriller Collection',
+          80: 'Crime Stories',
+          16: 'Animation World',
+        };
+
+        const rows = await Promise.all(
+
+          favoriteGenres.map(
+            async (genreId: number) => {
+
+              const movies =
+                await getMoviesByGenre(
+                  genreId
+                );
+
+              return {
+                title:
+                  genreMap[genreId] ||
+                  'Recommended Collection',
+
+                movies:
+                  movies.slice(0, 15),
+              };
+            }
+          )
+        );
+
+        setGenreRows(rows);
+
+      } catch (error) {
+
+        console.log(error);
+      }
+    }
+    loadGenreRows();
   }, []);
 
   async function loadMovies() {
@@ -92,8 +177,27 @@ export default function HomeScreen() {
 
       setTrendingMovies(trending);
 
+      const smartHeroMovies =
+
+        trending
+
+          .filter(
+            (movie: any) =>
+
+              movie.vote_average >= 7
+          )
+
+          .sort(
+            (a: any, b: any) =>
+
+              b.popularity -
+              a.popularity
+          )
+
+          .slice(0, 5);
+
       setHeroMovies(
-        trending.slice(0, 5)
+        smartHeroMovies
       );
 
       setTopRatedMovies(topRated);
@@ -117,11 +221,28 @@ export default function HomeScreen() {
     }
   }
 
+  async function loadRecommendedMovies() {
+
+    try {
+
+      const data =
+        await getRecommendedMovies();
+
+      setRecommendedMovies(data);
+
+    } catch (error) {
+
+      console.log(error);
+    }
+  }
+
   async function handleRefresh() {
 
     setRefreshing(true);
 
     await loadMovies();
+
+    await loadRecommendedMovies();
 
     setRefreshing(false);
   }
@@ -131,7 +252,8 @@ export default function HomeScreen() {
       style={{
         flex: 1,
 
-        backgroundColor: colors.background,
+        backgroundColor:
+          colors.background,
       }}
     >
       <StatusBar
@@ -147,8 +269,14 @@ export default function HomeScreen() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor={colors.accent}
+
+            onRefresh={
+              handleRefresh
+            }
+
+            tintColor={
+              colors.accent
+            }
           />
         }
 
@@ -163,19 +291,25 @@ export default function HomeScreen() {
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: 'space-between',
+
+            justifyContent:
+              'space-between',
+
             alignItems: 'center',
 
             paddingHorizontal: 20,
+
             paddingTop: 10,
           }}
         >
           <View>
             <Text
               style={{
-                color: colors.textPrimary,
+                color:
+                  colors.textPrimary,
 
                 fontSize: 30,
+
                 fontWeight: 'bold',
 
                 letterSpacing: 1,
@@ -186,7 +320,9 @@ export default function HomeScreen() {
 
             <Text
               style={{
-                color: colors.textSecondary,
+                color:
+                  colors.textSecondary,
+
                 marginTop: 2,
               }}
             >
@@ -197,29 +333,75 @@ export default function HomeScreen() {
           <View
             style={{
               flexDirection: 'row',
+
               alignItems: 'center',
+
               gap: 15,
             }}
           >
             <Ionicons
               name="search"
+
               size={24}
 
-              color={colors.textPrimary}
+              color={
+                colors.textPrimary
+              }
             />
 
             <Image
               source={{
-                uri: 'https://i.pravatar.cc/150?img=12',
+                uri:
+                  'https://i.pravatar.cc/150?img=12',
               }}
 
               style={{
                 width: 42,
+
                 height: 42,
+
                 borderRadius: 21,
               }}
             />
           </View>
+        </View>
+
+        {/* GREETING */}
+
+        <View
+          style={{
+            paddingHorizontal: 20,
+
+            paddingTop: 20,
+
+            marginBottom: 10,
+          }}
+        >
+          <Text
+            style={{
+              color:
+                colors.textSecondary,
+
+              fontSize: 16,
+            }}
+          >
+            Good Evening 👋
+          </Text>
+
+          <Text
+            style={{
+              color:
+                colors.textPrimary,
+
+              fontSize: 28,
+
+              fontWeight: 'bold',
+
+              marginTop: 6,
+            }}
+          >
+            Ready to stream tonight?
+          </Text>
         </View>
 
         {/* HERO */}
@@ -228,11 +410,63 @@ export default function HomeScreen() {
           movies={heroMovies}
         />
 
+        <ScrollView
+          horizontal
+
+          showsHorizontalScrollIndicator={false}
+
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+
+            marginTop: 24,
+          }}
+        >
+          {[
+            'Movies',
+            'Trending',
+            'Action',
+            'Sci-Fi',
+            'Drama',
+            'Thriller',
+          ].map((item, index) => (
+
+            <View
+              key={index}
+
+              style={{
+                backgroundColor:
+                  index === 0
+                    ? '#4DA2FF'
+                    : 'rgba(255,255,255,0.08)',
+
+                paddingHorizontal: 20,
+
+                paddingVertical: 12,
+
+                borderRadius: 28,
+
+                marginRight: 12,
+              }}
+            >
+              <Text
+                style={{
+                  color: '#FFFFFF',
+
+                  fontWeight: '600',
+                }}
+              >
+                {item}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+
         {loading ? (
 
           <View
             style={{
               marginTop: 35,
+
               paddingLeft: 20,
             }}
           >
@@ -255,11 +489,34 @@ export default function HomeScreen() {
 
               <MovieRow
                 title="Continue Watching"
-                movies={continueWatching}
+                movies={
+                  continueWatching
+                }
               />
-
             )}
 
+            {recommendedMovies.length > 0 && (
+
+              <MovieRow
+                title="Recommended For You"
+                movies={
+                  recommendedMovies
+                }
+              />
+            )}
+            {genreRows.map((row, index) => (
+
+              <MovieRow
+                key={index}
+
+                title={row.title}
+
+                movies={row.movies}
+              />
+            ))}
+            <TopTenRow
+              movies={trendingMovies}
+            />
             <MovieRow
               title="Trending Now"
               movies={trendingMovies}

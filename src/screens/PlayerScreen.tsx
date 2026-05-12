@@ -50,6 +50,10 @@ export default function PlayerScreen() {
   const [trailerKey, setTrailerKey] =
     useState('');
 
+
+  const [isPlaying, setIsPlaying] =
+    useState(true);
+
   useEffect(() => {
     loadTrailer();
     saveContinueWatching(movie);
@@ -86,28 +90,136 @@ export default function PlayerScreen() {
     >
       {/* VIDEO PLAYER */}
 
-      <Video
-
-        ref={video}
-
-        source={{
-          uri:
-            'https://www.w3schools.com/html/mov_bbb.mp4',
-        }}
-
+      <View
         style={{
           width: '100%',
           height: 260,
 
-          backgroundColor: colors.videoBackdrop,
+          backgroundColor:
+            colors.videoBackdrop,
         }}
+      >
+        <Video
+          ref={video}
 
-        useNativeControls
+          source={{
+            uri:
+              'https://www.w3schools.com/html/mov_bbb.mp4',
+          }}
 
-        resizeMode={ResizeMode.CONTAIN}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
 
-        shouldPlay
-      />
+          resizeMode={
+            ResizeMode.CONTAIN
+          }
+
+          shouldPlay
+        />
+
+        {/* OVERLAY */}
+
+        <View
+          style={{
+            position: 'absolute',
+
+            width: '100%',
+            height: '100%',
+
+            backgroundColor:
+              'rgba(0,0,0,0.25)',
+
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {/* CONTROLS */}
+
+          <View
+            style={{
+              flexDirection: 'row',
+
+              alignItems: 'center',
+            }}
+          >
+            {/* BACKWARD */}
+
+            <TouchableOpacity
+              style={{
+                marginRight: 35,
+              }}
+            >
+              <Ionicons
+                name="play-back"
+                size={34}
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+
+            {/* PLAY */}
+
+            <TouchableOpacity
+
+              onPress={async () => {
+
+                if (isPlaying) {
+
+                  await video.current.pauseAsync();
+
+                  setIsPlaying(false);
+
+                } else {
+
+                  await video.current.playAsync();
+
+                  setIsPlaying(true);
+                }
+              }}
+
+              style={{
+                width: 74,
+                height: 74,
+
+                borderRadius: 37,
+
+                backgroundColor:
+                  'rgba(255,255,255,0.2)',
+
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons
+                name={
+                  isPlaying
+                    ? 'pause'
+                    : 'play'
+                }
+
+                size={40}
+
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+
+            {/* FORWARD */}
+
+            <TouchableOpacity
+              style={{
+                marginLeft: 35,
+              }}
+            >
+              <Ionicons
+                name="play-forward"
+                size={34}
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
 
       {/* CONTENT */}
 
@@ -145,7 +257,7 @@ export default function PlayerScreen() {
             style={{
               marginTop: 25,
 
-              backgroundColor: '#FF0000',
+              backgroundColor: '#E50914',
 
               paddingVertical: 14,
 
@@ -161,23 +273,47 @@ export default function PlayerScreen() {
                 fontSize: 16,
               }}
             >
-              Watch Official Trailer
+              ▶ Watch Official Trailer
             </Text>
           </TouchableOpacity>
 
         ) : null}
 
-        <Text
+        <View
           style={{
-            color: colors.accent,
+            flexDirection: 'row',
 
-            marginTop: 10,
+            alignItems: 'center',
 
-            fontSize: 15,
+            marginTop: 16,
           }}
         >
-          Streaming now...
-        </Text>
+          <View
+            style={{
+              width: 10,
+              height: 10,
+
+              borderRadius: 5,
+
+              backgroundColor: '#00D26A',
+
+              marginRight: 8,
+            }}
+          />
+
+          <Text
+            style={{
+              color: colors.accent,
+
+              fontSize: 15,
+
+              fontWeight: '600',
+            }}
+          >
+            Live Streaming Available
+          </Text>
+        </View>
+
 
         {/* OVERVIEW */}
 

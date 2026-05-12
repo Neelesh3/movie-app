@@ -151,3 +151,30 @@ export async function getSimilarMovies(
 
   return data.results ?? [];
 }
+
+export async function getMoviesByGenre(
+  genreId: number
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        `https://api.themoviedb.org/3/discover/movie?with_genres=${genreId}`,
+         {
+    headers,
+  }
+      );
+
+    const data =
+      await response.json();
+
+    return data.results || [];
+
+  } catch (error) {
+
+    console.log(error);
+
+    return [];
+  }
+}
