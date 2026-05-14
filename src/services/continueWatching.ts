@@ -1,28 +1,37 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage
+from '@react-native-async-storage/async-storage';
 
 import {
-  getUserScopedKey,
-} from './session';
+  syncContinueWatchingToCloud,
+  getCloudContinueWatching,
+} from './cloudContinueWatching';
 
 const CONTINUE_KEY =
   'cinebluish_continue';
 
-export async function getContinueWatching() {
+export async function
+getContinueWatching() {
 
   try {
 
-    const key =
-      await getUserScopedKey(
-        CONTINUE_KEY
-      );
+    const cloud =
+      await getCloudContinueWatching();
+
+    if (
+      Array.isArray(cloud) &&
+      cloud.length
+    ) {
+      return cloud;
+    }
 
     const data =
-      await AsyncStorage.getItem(key) ||
       await AsyncStorage.getItem(
         CONTINUE_KEY
       );
 
-    return data ? JSON.parse(data) : [];
+    return data
+      ? JSON.parse(data)
+      : [];
 
   } catch (error) {
 
@@ -32,7 +41,8 @@ export async function getContinueWatching() {
   }
 }
 
-export async function saveContinueWatching(
+export async function
+saveContinueWatching(
   movie: any
 ) {
 
@@ -52,17 +62,17 @@ export async function saveContinueWatching(
       ...filtered,
     ];
 
-    const key =
-      await getUserScopedKey(
-        CONTINUE_KEY
-      );
-
     await AsyncStorage.setItem(
-      key,
+      CONTINUE_KEY,
       JSON.stringify(updated)
     );
 
+    await syncContinueWatchingToCloud(
+      updated
+    );
+
   } catch (error) {
+
     console.log(error);
   }
 }
