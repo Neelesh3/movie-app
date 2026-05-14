@@ -40,6 +40,10 @@ import {
 
 import PressScale from '../components/PressScale';
 
+import {
+  useSessionStore,
+} from '../stores/sessionStore';
+
 type SlideModel = {
   id: string;
   title: string;
@@ -144,6 +148,11 @@ export default function OnboardingScreen() {
   const navigation: any =
     useNavigation();
 
+  const authUser =
+    useSessionStore(
+      (state) => state.authUser
+    );
+
   const {
     darkMode,
     colors,
@@ -174,9 +183,13 @@ export default function OnboardingScreen() {
 
       await setOnboardingComplete();
 
-      navigation.replace('MainTabs');
+      navigation.replace(
+        authUser
+          ? 'MainTabs'
+          : 'Login'
+      );
 
-    }, [navigation]);
+    }, [authUser, navigation]);
 
   const goNext =
     useCallback(() => {

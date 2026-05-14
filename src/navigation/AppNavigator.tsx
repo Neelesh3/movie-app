@@ -18,6 +18,8 @@ import MovieDetailScreen from '../screens/MovieDetailScreen';
 import PlayerScreen from '../screens/PlayerScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
+import LoginScreen from '../screens/LoginScreen';
+import SignupScreen from '../screens/SignupScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -99,20 +101,25 @@ function BottomTabs() {
 }
 
 type AppNavigatorProps = {
+  initialIsAuthenticated: boolean;
   initialShowOnboarding: boolean;
 };
 
 export default function AppNavigator({
+  initialIsAuthenticated,
   initialShowOnboarding,
 }: AppNavigatorProps) {
 
+  const initialRouteName =
+    initialShowOnboarding
+      ? 'Onboarding'
+      : initialIsAuthenticated
+        ? 'MainTabs'
+        : 'Login';
+
   return (
     <Stack.Navigator
-      initialRouteName={
-        initialShowOnboarding
-          ? 'Onboarding'
-          : 'MainTabs'
-      }
+      initialRouteName={initialRouteName}
       screenOptions={{
         headerShown: false,
 
@@ -132,6 +139,26 @@ export default function AppNavigator({
           animation: 'fade',
 
           animationDuration: 420,
+        }}
+      />
+
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{
+          animation: 'fade',
+
+          animationDuration: 320,
+        }}
+      />
+
+      <Stack.Screen
+        name="Signup"
+        component={SignupScreen}
+        options={{
+          animation: 'slide_from_right',
+
+          animationDuration: 320,
         }}
       />
 

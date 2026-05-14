@@ -43,6 +43,24 @@ export const DEFAULT_USER_PROFILE:
     updatedAt: 0,
   };
 
+export function getProfileNameFromEmail(
+  email?: string | null
+) {
+
+  if (!email) {
+    return DEFAULT_USER_PROFILE.name;
+  }
+
+  return email
+    .split('@')[0]
+    .replace(/[._-]+/g, ' ')
+    .replace(/\b\w/g, (letter) =>
+      letter.toUpperCase()
+    )
+    .trim() ||
+    DEFAULT_USER_PROFILE.name;
+}
+
 function withTimestamp(
   profile: UserProfile
 ): UserProfile {
@@ -150,6 +168,42 @@ export async function saveStoredUserProfile(
   } catch (error) {
     console.log(error);
   }
+}
+
+export async function syncFirebaseUserProfile(
+  firebaseUser: {
+    displayName?: string | null;
+    email?: string | null;
+    uid: string;
+  }
+) {
+
+  const existing =
+    await getStoredUserProfile();
+
+  const isSameUser =
+    existing.id === firebaseUser.uid;
+
+  const next: UserProfile = {
+    ...existing,
+    id: firebaseUser.uid,
+    name:
+      isSameUser
+        ? existing.name
+        : firebaseUser.displayName ||
+          getProfileNameFromEmail(
+            firebaseUser.email
+          ),
+    avatarId:
+      isSameUser
+        ? existing.avatarId
+        : DEFAULT_USER_PROFILE.avatarId,
+    updatedAt: Date.now(),
+  };
+
+  await saveStoredUserProfile(next);
+
+  return next;
 }
 
 export async function getActiveUserId() {

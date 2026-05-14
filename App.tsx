@@ -39,6 +39,10 @@ import {
 } from './src/services/onboarding';
 
 import {
+  listenToAuthState,
+} from './src/services/auth';
+
+import {
   useWatchlistStore,
 } from './src/stores/watchlistStore';
 
@@ -61,6 +65,7 @@ function AppNavigationRoot() {
     session,
     setSession,
   ] = useState<{
+    isAuthenticated: boolean;
     showOnboarding: boolean;
   } | null>(null);
 
@@ -68,59 +73,91 @@ function AppNavigationRoot() {
 
     let cancelled = false;
 
-    (async () => {
+    let handledInitialAuth = false;
 
-      try {
+    const authUnsubscribe =
+      listenToAuthState(
+        async (authUser) => {
 
-        await useSessionStore
-          .getState()
-          .hydrate();
+          try {
 
-        const [, , done] =
-          await Promise.all([
-            useWatchlistStore
+            await useSessionStore
               .getState()
-              .hydrate(),
+              .setAuthUser(authUser);
 
-            useDownloadStore
+            if (!authUser) {
+              await useSessionStore
+                .getState()
+                .hydrate();
+            }
+
+            const [, , done] =
+              await Promise.all([
+                useWatchlistStore
+                  .getState()
+                  .hydrate(),
+
+                useDownloadStore
+                  .getState()
+                  .hydrate(),
+
+                getOnboardingComplete(),
+              ]);
+
+            if (!cancelled) {
+              setSession((current) =>
+                current
+                  ? {
+                    ...current,
+                    isAuthenticated:
+                      Boolean(authUser),
+                  }
+                  : {
+                    isAuthenticated:
+                      Boolean(authUser),
+                    showOnboarding:
+                      !done,
+                  }
+              );
+            }
+
+            handledInitialAuth = true;
+
+          } catch {
+
+            if (
+              cancelled ||
+              handledInitialAuth
+            ) {
+              return;
+            }
+
+            await useSessionStore
               .getState()
-              .hydrate(),
+              .hydrate()
+              .catch(() => {});
 
-            getOnboardingComplete(),
-          ]);
+            await useWatchlistStore
+              .getState()
+              .hydrate()
+              .catch(() => {});
 
-        if (!cancelled) {
-          setSession({
-            showOnboarding: !done,
-          });
+            await useDownloadStore
+              .getState()
+              .hydrate()
+              .catch(() => {});
+
+            setSession({
+              isAuthenticated: false,
+              showOnboarding: true,
+            });
+          }
         }
-      } catch {
-
-        if (!cancelled) {
-          await useSessionStore
-            .getState()
-            .hydrate()
-            .catch(() => {});
-
-          await useWatchlistStore
-            .getState()
-            .hydrate()
-            .catch(() => {});
-
-          await useDownloadStore
-            .getState()
-            .hydrate()
-            .catch(() => {});
-
-          setSession({
-            showOnboarding: true,
-          });
-        }
-      }
-    })();
+      );
 
     return () => {
       cancelled = true;
+      authUnsubscribe();
     };
   }, []);
 
@@ -153,6 +190,9 @@ function AppNavigationRoot() {
   return (
     <NavigationContainer>
       <AppNavigator
+        initialIsAuthenticated={
+          session.isAuthenticated
+        }
         initialShowOnboarding={
           session.showOnboarding
         }

@@ -24,6 +24,10 @@ import {
 } from '../context/ThemeContext';
 
 import {
+  logout,
+} from '../services/auth';
+
+import {
   PROFILE_AVATARS,
   getAvatarUri,
   getFirstName,
@@ -165,6 +169,20 @@ export default function ProfileScreen() {
     await updateUser({
       name: draftName,
       avatarId: draftAvatarId,
+    });
+  }
+
+  async function handleSignOut() {
+
+    await logout();
+
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'Login',
+        },
+      ],
     });
   }
 
@@ -559,6 +577,62 @@ export default function ProfileScreen() {
             </TouchableOpacity>
 
           ))}
+
+          <TouchableOpacity
+            onPress={handleSignOut}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent:
+                'space-between',
+
+              backgroundColor:
+                'rgba(255,77,109,0.12)',
+
+              padding: 18,
+
+              borderRadius: 22,
+
+              marginBottom: 16,
+
+              borderWidth: 1,
+
+              borderColor:
+                'rgba(255,77,109,0.22)',
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons
+                name="log-out-outline"
+                size={24}
+                color="#FF6B8A"
+              />
+
+              <Text
+                style={{
+                  color: '#FFB3C1',
+
+                  marginLeft: 16,
+
+                  fontSize: 16,
+                  fontWeight: '700',
+                }}
+              >
+                Sign Out
+              </Text>
+            </View>
+
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color="#FFB3C1"
+            />
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
