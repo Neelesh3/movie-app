@@ -7,6 +7,10 @@ import {
 
 import * as FirebaseAuth from 'firebase/auth';
 
+  import {
+  getFirestore,
+} from 'firebase/firestore';
+
 const firebaseConfig = {
   apiKey: 'AIzaSyB7vVY82-jyYK6qmFaGiDcVVRHsh-vDc2o',
 
@@ -51,3 +55,6 @@ export const auth =
       return authModule.getAuth(app);
     }
   })();
+
+export const db =
+  getFirestore(app);

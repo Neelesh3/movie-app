@@ -8,20 +8,33 @@ import {
   removeFromWatchlist,
 } from '../services/watchlist';
 
+import {
+  syncWatchlistToCloud,
+  getCloudWatchlist,
+} from '../services/cloudWatchlist';
+
 export type WatchlistStore = {
+
   items: any[];
 
   hydrated: boolean;
 
   hydrate: () => Promise<void>;
 
-  toggle: (movie: any) => Promise<void>;
+  toggle: (
+    movie: any
+  ) => Promise<void>;
 
-  isSaved: (movieId: number) => boolean;
+  isSaved: (
+    movieId: number
+  ) => boolean;
 };
 
 export const useWatchlistStore =
-  create<WatchlistStore>((set, get) => ({
+  create<WatchlistStore>((
+    set,
+    get
+  ) => ({
 
     items: [],
 
@@ -31,13 +44,24 @@ export const useWatchlistStore =
 
       try {
 
-        const list =
+        const local =
           await getWatchlist();
 
+        const cloud =
+          await getCloudWatchlist();
+
+        const finalList =
+          cloud.length
+            ? cloud
+            : local;
+
         set({
+
           items:
-            Array.isArray(list)
-              ? list
+            Array.isArray(
+              finalList
+            )
+              ? finalList
               : [],
 
           hydrated: true,
@@ -48,14 +72,14 @@ export const useWatchlistStore =
         console.log(error);
 
         set({
-          items: [],
-
           hydrated: true,
         });
       }
     },
 
-    isSaved: (movieId: number) => {
+    isSaved: (
+      movieId: number
+    ) => {
 
       return get().items.some(
         (m: any) =>
@@ -63,7 +87,9 @@ export const useWatchlistStore =
       );
     },
 
-    toggle: async (movie: any) => {
+    toggle: async (
+      movie: any
+    ) => {
 
       try {
 
@@ -78,7 +104,11 @@ export const useWatchlistStore =
         }
 
         const alreadySaved =
-          get().isSaved(movieId);
+          get().isSaved(
+            movieId
+          );
+
+        /* REMOVE */
 
         if (alreadySaved) {
 
@@ -86,28 +116,46 @@ export const useWatchlistStore =
             movieId
           );
 
+          const updatedItems =
+            get().items.filter(
+              (m: any) =>
+                m?.id !== movieId
+            );
+
           set({
             items:
-              get().items.filter(
-                (m: any) =>
-                  m?.id !== movieId
-              ),
+              updatedItems,
           });
+
+          await syncWatchlistToCloud(
+            updatedItems
+          );
 
           return;
         }
 
-        await addToWatchlist(movie);
+        /* ADD */
 
-        const updatedList =
+        await addToWatchlist(
+          movie
+        );
+
+        const fresh =
           await getWatchlist();
+
+        const updatedItems =
+          Array.isArray(fresh)
+            ? fresh
+            : [];
 
         set({
           items:
-            Array.isArray(updatedList)
-              ? updatedList
-              : [],
+            updatedItems,
         });
+
+        await syncWatchlistToCloud(
+          updatedItems
+        );
 
       } catch (error) {
 
