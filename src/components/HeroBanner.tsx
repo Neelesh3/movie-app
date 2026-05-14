@@ -8,7 +8,10 @@ import {
   View,
   Text,
   Animated,
-  Easing,
+  ImageBackground,
+  ScrollView,
+  Dimensions,
+  StatusBar,
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -19,15 +22,10 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 
-import YoutubePlayer from 'react-native-youtube-iframe';
-
 import PressScale from './PressScale';
 
-import FadeInImage from './FadeInImage';
-
-import {
-  getMovieVideos,
-} from '../api/tmdb';
+const { width } =
+  Dimensions.get('window');
 
 type Props = {
   movies: any[];
@@ -45,36 +43,18 @@ function HeroBanner({
     setCurrentIndex,
   ] = useState(0);
 
-  const [
-    trailerKey,
-    setTrailerKey,
-  ] = useState('');
-
-  const [
-    isTrailerReady,
-    setIsTrailerReady,
-  ] = useState(false);
-
   const scaleAnim =
     useRef(
       new Animated.Value(1)
     ).current;
 
   const fadeAnim =
-  useRef(
-    new Animated.Value(0)
-  ).current;
-
-  const trailerFadeAnim =
     useRef(
       new Animated.Value(0)
     ).current;
 
-  const loadingPulseAnim =
-    useRef(
-      new Animated.Value(0)
-    ).current;
-
+  const scrollRef =
+    useRef<any>(null);
 
   /* AUTO SLIDER */
 
@@ -87,12 +67,21 @@ function HeroBanner({
     const interval =
       setInterval(() => {
 
-        setCurrentIndex((prev) =>
+        setCurrentIndex((prev) => {
 
-          prev === movies.length - 1
-            ? 0
-            : prev + 1
-        );
+          const nextIndex =
+            prev === movies.length - 1
+              ? 0
+              : prev + 1;
+
+          scrollRef.current?.scrollTo({
+            x: nextIndex * width,
+
+            animated: true,
+          });
+
+          return nextIndex;
+        });
 
       }, 12000);
 
@@ -100,82 +89,6 @@ function HeroBanner({
       clearInterval(interval);
 
   }, [movies]);
-
-  /* LOAD TRAILER */
-
-  useEffect(() => {
-
-    let cancelled = false;
-
-    setIsTrailerReady(false);
-
-    trailerFadeAnim.setValue(0);
-
-    setTrailerKey('');
-
-    async function loadTrailer() {
-
-      try {
-
-        const movie =
-          movies[currentIndex];
-
-        if (!movie?.id) {
-          setTrailerKey('');
-
-          return;
-        }
-
-        const videos =
-          await getMovieVideos(
-            movie.id
-          );
-
-        const trailer =
-          videos.find(
-            (item: any) =>
-              item.type ===
-              'Trailer'
-          );
-
-        if (trailer?.key) {
-
-          if (cancelled) {
-            return;
-          }
-
-          setTrailerKey(
-            trailer.key
-          );
-
-        } else {
-
-          if (cancelled) {
-            return;
-          }
-
-          setTrailerKey('');
-        }
-
-      } catch (error) {
-
-        if (cancelled) {
-          return;
-        }
-
-        console.log(error);
-
-        setTrailerKey('');
-      }
-    }
-
-    loadTrailer();
-
-    return () => {
-      cancelled = true;
-    };
-
-  }, [currentIndex, movies]);
 
   /* CINEMATIC ZOOM */
 
@@ -188,9 +101,9 @@ function HeroBanner({
         Animated.timing(
           scaleAnim,
           {
-            toValue: 1.08,
+            toValue: 1.04,
 
-            duration: 8000,
+            duration: 9000,
 
             useNativeDriver: true,
           }
@@ -201,7 +114,7 @@ function HeroBanner({
           {
             toValue: 1,
 
-            duration: 8000,
+            duration: 9000,
 
             useNativeDriver: true,
           }
@@ -211,97 +124,24 @@ function HeroBanner({
 
   }, []);
 
-  /* TRAILER LOADING PULSE */
+  /* FADE */
 
   useEffect(() => {
 
-    if (!trailerKey ||
-      isTrailerReady) {
-      return;
-    }
-
-    const pulse =
-      Animated.loop(
-        Animated.sequence([
-
-          Animated.timing(
-            loadingPulseAnim,
-            {
-              toValue: 1,
-
-              duration: 1400,
-
-              easing:
-                Easing.inOut(
-                  Easing.ease
-                ),
-
-              useNativeDriver: true,
-            }
-          ),
-
-          Animated.timing(
-            loadingPulseAnim,
-            {
-              toValue: 0,
-
-              duration: 1400,
-
-              easing:
-                Easing.inOut(
-                  Easing.ease
-                ),
-
-              useNativeDriver: true,
-            }
-          ),
-        ])
-      );
-
-    pulse.start();
-
-    return () => pulse.stop();
-
-  }, [trailerKey, isTrailerReady]);
-
-  useEffect(() => {
-
-  fadeAnim.setValue(0);
-
-  Animated.timing(
-    fadeAnim,
-    {
-      toValue: 1,
-
-      duration: 1200,
-
-      useNativeDriver: true,
-    }
-  ).start();
-
-}, [currentIndex]);
-
-  function handleTrailerReady() {
-
-    setIsTrailerReady(true);
+    fadeAnim.setValue(0);
 
     Animated.timing(
-      trailerFadeAnim,
+      fadeAnim,
       {
         toValue: 1,
 
-        duration: 900,
-
-        easing:
-          Easing.out(
-            Easing.cubic
-          ),
+        duration: 700,
 
         useNativeDriver: true,
       }
     ).start();
-  }
 
+  }, [currentIndex]);
 
   const movie =
     movies[currentIndex];
@@ -311,537 +151,367 @@ function HeroBanner({
   }
 
   return (
-
-    <Animated.View
-      style={{
-        height: 520,
-
-        transform: [
-          {
-            scale: scaleAnim,
-          },
-        ],
-      }}
-    >
-      {/* VIDEO PREVIEW */}
-
-      <FadeInImage
-        source={{
-          uri:
-            `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`,
-        }}
-
-        fadeDurationMs={360}
-
-        placeholderColor="#020814"
-
-        style={{
-          height: 520,
-
-          backgroundColor:
-            '#020814',
-        }}
+    <>
+      <StatusBar
+        barStyle="light-content"
       />
 
-      {trailerKey ? (
+      <ScrollView
 
-        <Animated.View
-          key={trailerKey}
+        ref={scrollRef}
 
-          style={{
-            position: 'absolute',
+        horizontal
 
-            top: 0,
-            left: 0,
-            right: 0,
+        pagingEnabled
 
-            height: 520,
+        bounces={false}
 
-            opacity:
-              trailerFadeAnim,
+        scrollEventThrottle={16}
 
-            backgroundColor:
-              'transparent',
-          }}
-        >
-          <YoutubePlayer
-            height={520}
+        decelerationRate="fast"
 
-            play
+        snapToInterval={width}
 
-            mute
+        snapToAlignment="center"
 
-            initialPlayerParams={{
-              controls: false,
+        showsHorizontalScrollIndicator={false}
 
-              modestbranding: true,
+        onMomentumScrollEnd={(e) => {
 
-              rel: false,
+          const index =
+            Math.round(
+              e.nativeEvent.contentOffset.x /
+              width
+            );
 
-              loop: true,
-            }}
-
-            onReady={
-              handleTrailerReady
-            }
-
-            videoId={trailerKey}
-          />
-        </Animated.View>
-
-      ) : null}
-
-      {trailerKey &&
-        !isTrailerReady ? (
-
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-
-            top: 0,
-            left: 0,
-            right: 0,
-
-            height: 520,
-          }}
-        >
-          <LinearGradient
-            colors={[
-              'rgba(2,8,20,0.22)',
-              'rgba(2,8,20,0.48)',
-              'rgba(0,0,0,0.92)',
-            ]}
-
-            style={{
-              position: 'absolute',
-
-              width: '100%',
-              height: '100%',
-            }}
-          />
-
-          <View
-            style={{
-              position: 'absolute',
-
-              left: 20,
-              right: 20,
-              bottom: 168,
-            }}
-          >
-            <Animated.View
-              style={{
-                width: 52,
-                height: 52,
-
-                borderRadius: 26,
-
-                alignItems: 'center',
-                justifyContent: 'center',
-
-                backgroundColor:
-                  'rgba(77,162,255,0.18)',
-
-                borderWidth: 1,
-
-                borderColor:
-                  'rgba(255,255,255,0.18)',
-
-                opacity:
-                  loadingPulseAnim.interpolate({
-                    inputRange: [0, 1],
-
-                    outputRange: [0.55, 1],
-                  }),
-              }}
-            >
-              <Ionicons
-                name="play"
-
-                size={22}
-
-                color="#FFFFFF"
-              />
-            </Animated.View>
-
-            <View
-              style={{
-                width: 140,
-                height: 3,
-
-                borderRadius: 3,
-
-                marginTop: 18,
-
-                overflow: 'hidden',
-
-                backgroundColor:
-                  'rgba(255,255,255,0.16)',
-              }}
-            >
-              <Animated.View
-                style={{
-                  width: '58%',
-                  height: '100%',
-
-                  borderRadius: 3,
-
-                  backgroundColor:
-                    '#4DA2FF',
-
-                  opacity:
-                    loadingPulseAnim.interpolate({
-                      inputRange: [0, 1],
-
-                      outputRange: [0.45, 0.95],
-                    }),
-
-                  transform: [
-                    {
-                      translateX:
-                        loadingPulseAnim.interpolate({
-                          inputRange: [0, 1],
-
-                          outputRange: [-60, 110],
-                        }),
-                    },
-                  ],
-                }}
-              />
-            </View>
-          </View>
-        </View>
-
-      ) : null}
-
-      {/* OVERLAY */}
-
-      <LinearGradient
-
-        colors={
-          trailerKey
-            ? [
-              'rgba(0,0,0,0.05)',
-              'rgba(0,0,0,0.35)',
-              'rgba(0,0,0,0.98)',
-            ]
-            : [
-              'rgba(0,0,0,0.18)',
-              'rgba(0,0,0,0.52)',
-              'rgba(0,0,0,0.98)',
-            ]}
-
-        style={{
-          position: 'absolute',
-
-          width: '100%',
-          height: '100%',
-
-          justifyContent: 'flex-end',
+          setCurrentIndex(index);
         }}
       >
-<Animated.View
-  style={{
-    padding: 20,
+        {movies.map(
+          (movie: any, index: number) => (
 
-    opacity: fadeAnim,
-  }}
->
-          {/* TITLE */}
+            <Animated.View
+              key={movie.id}
 
-          <Text
-            style={{
-              color: '#FFFFFF',
-
-              fontSize: 34,
-
-              fontWeight: 'bold',
-
-              width: '80%',
-            }}
-          >
-            {movie.title}
-          </Text>
-
-          {/* OVERVIEW */}
-
-          <Text
-            numberOfLines={2}
-
-
-            style={{
-              color: '#D6D6D6',
-
-              marginTop: 12,
-
-              lineHeight: 22,
-            }}
-          >
-            {movie.overview}
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-
-              flexWrap: 'wrap',
-
-              marginTop: 16,
-            }}
-          >
-            {/* HD */}
-
-            <View
               style={{
-                backgroundColor:
-                  'rgba(255,255,255,0.14)',
+                width,
 
-                paddingHorizontal: 12,
+                height: 540,
 
-                paddingVertical: 6,
-
-                borderRadius: 20,
-
-                marginRight: 10,
-
-                marginBottom: 10,
+                transform: [
+                  {
+                    scale:
+                      currentIndex === index
+                        ? scaleAnim
+                        : 1,
+                  },
+                ],
               }}
             >
-              <Text
+              <ImageBackground
+                source={{
+                  uri:
+                    `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`,
+                }}
+
+                resizeMode="cover"
+
                 style={{
-                  color: '#FFFFFF',
-
-                  fontWeight: '600',
-
-                  fontSize: 12,
+                  width: '100%',
+                  height: '100%',
                 }}
               >
-                HD
-              </Text>
-            </View>
+                <LinearGradient
 
-            {/* RATING */}
+                  colors={[
+                    'rgba(0,0,0,0.15)',
+                    'rgba(0,0,0,0.58)',
+                    'rgba(0,0,0,1)',
+                  ]}
 
-            <View
-              style={{
-                backgroundColor:
-                  'rgba(255,255,255,0.14)',
-
-                paddingHorizontal: 12,
-
-                paddingVertical: 6,
-
-                borderRadius: 20,
-
-                marginRight: 10,
-
-                marginBottom: 10,
-              }}
-            >
-              <Text
-                style={{
-                  color: '#FFFFFF',
-
-                  fontWeight: '600',
-
-                  fontSize: 12,
-                }}
-              >
-                IMDb {movie.vote_average?.toFixed(1)}
-              </Text>
-            </View>
-
-            {/* ADULT */}
-
-            {movie.adult ? (
-
-              <View
-                style={{
-                  backgroundColor:
-                    'rgba(255,80,80,0.18)',
-
-                  paddingHorizontal: 12,
-
-                  paddingVertical: 6,
-
-                  borderRadius: 20,
-
-                  marginRight: 10,
-                }}
-              >
-                <Text
                   style={{
-                    color: '#FFFFFF',
+                    flex: 1,
 
-                    fontWeight: '600',
-
-                    fontSize: 12,
+                    justifyContent: 'flex-end',
                   }}
                 >
-                  18+
-                </Text>
-              </View>
+                  <Animated.View
+                    style={{
+                      paddingHorizontal: 22,
 
-            ) : null}
-          </View>
+                      paddingBottom: 52,
 
-          {/* BUTTONS */}
+                      opacity:
+                        currentIndex === index
+                          ? fadeAnim
+                          : 1,
+                    }}
+                  >
+                    {/* TITLE */}
 
-          <View
-            style={{
-              flexDirection: 'row',
+                    <Text
+                      style={{
+                        color: '#FFFFFF',
 
-              marginTop: 25,
-            }}
-          >
-            {/* PLAY */}
+                        fontSize: 38,
 
-            <PressScale
+                        fontWeight: '800',
 
-              onPress={() =>
-                navigation.navigate(
-                  'Player',
-                  {
-                    movie,
-                  }
-                )
-              }
+                        letterSpacing: 0.5,
 
-              style={{
-                backgroundColor:
-                  'rgba(77,162,255,0.22)',
+                        width: '68%',
+                      }}
+                    >
+                      {movie.title}
+                    </Text>
 
-                borderWidth: 1,
+                    {/* OVERVIEW */}
 
-                borderColor:
-                  'rgba(255,255,255,0.15)',
+                    <Text
+                      numberOfLines={2}
 
-                shadowColor: '#4DA2FF',
+                      style={{
+                        color: '#D6D6D6',
 
-                shadowOpacity: 0.45,
+                        marginTop: 14,
 
-                shadowRadius: 12,
+                        lineHeight: 24,
 
-                shadowOffset: {
-                  width: 0,
-                  height: 4,
-                },
+                        fontSize: 15,
 
-                elevation: 8,
-              }}
-            >
-              <Ionicons
-                name="play"
+                        width: '72%',
+                      }}
+                    >
+                      {movie.overview}
+                    </Text>
 
-                size={22}
+                    {/* META */}
 
-                color="#FFFFFF"
-              />
+                    <View
+                      style={{
+                        flexDirection: 'row',
 
-              <Text
-                style={{
-                  color: '#FFFFFF',
+                        marginTop: 18,
+                      }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor:
+                            'rgba(255,255,255,0.12)',
 
-                  marginLeft: 8,
+                          paddingHorizontal: 14,
 
-                  fontWeight: '600',
-                }}
-              >
-                Play
-              </Text>
-            </PressScale>
+                          paddingVertical: 8,
 
-            {/* DETAILS */}
+                          borderRadius: 20,
 
-            <PressScale
+                          marginRight: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#FFFFFF',
 
-              onPress={() =>
-                navigation.navigate(
-                  'MovieDetail',
-                  {
-                    movie,
-                  }
-                )
-              }
+                            fontWeight: '600',
+                          }}
+                        >
+                          HD
+                        </Text>
+                      </View>
 
-              style={{
-                backgroundColor:
-                  'rgba(255,255,255,0.12)',
+                      <View
+                        style={{
+                          backgroundColor:
+                            'rgba(255,255,255,0.12)',
 
-                borderWidth: 1,
+                          paddingHorizontal: 14,
 
-                borderColor:
-                  'rgba(255,255,255,0.12)',
+                          paddingVertical: 8,
 
+                          borderRadius: 20,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#FFFFFF',
 
+                            fontWeight: '600',
+                          }}
+                        >
+                          IMDb {movie.vote_average?.toFixed(1)}
+                        </Text>
+                      </View>
+                    </View>
 
-              }}
-            >
-              <Ionicons
-                name="information-circle-outline"
+                    {/* BUTTONS */}
 
-                size={22}
+                    <View
+                      style={{
+                        flexDirection: 'row',
 
-                color="#FFFFFF"
-              />
+                        marginTop: 22,
+                      }}
+                    >
+                      {/* PLAY */}
 
-              <Text
-                style={{
-                  color: '#FFFFFF',
+                      <PressScale
 
-                  marginLeft: 8,
+                        onPress={() =>
+                          navigation.navigate(
+                            'Player',
+                            {
+                              movie,
+                            }
+                          )
+                        }
 
-                  fontWeight: '600',
-                }}
-              >
-                Details
-              </Text>
-            </PressScale>
-          </View>
+                        style={{
+                          backgroundColor:
+                            '#FFFFFF',
 
-          {/* INDICATORS */}
+                          flexDirection: 'row',
 
-          <View
-            style={{
-              flexDirection: 'row',
+                          alignItems: 'center',
 
-              justifyContent: 'center',
+                          justifyContent: 'center',
 
-              marginTop: 30,
+                          paddingHorizontal: 30,
 
-              marginBottom: 18,
-            }}
-          >
-            {movies.map(
-              (_: any, index: number) => (
+                          height: 54,
 
-                <View
-                  key={index}
+                          borderRadius: 28,
 
-                  style={{
-                    width:
-                      currentIndex === index
-                        ? 24
-                        : 8,
+                          marginRight: 14,
+                        }}
+                      >
+                        <Ionicons
+                          name="play"
 
-                    height: 8,
+                          size={22}
 
-                    borderRadius: 4,
+                          color="#000000"
+                        />
 
-                    backgroundColor:
-                      currentIndex === index
-                        ? '#4DA2FF'
-                        : 'rgba(255,255,255,0.45)',
+                        <Text
+                          style={{
+                            color: '#000000',
 
-                    marginHorizontal: 4,
-                  }}
-                />
-              )
-            )}
-          </View>
-        </Animated.View>
-      </LinearGradient>
-    </Animated.View>
+                            marginLeft: 8,
+
+                            fontWeight: '700',
+
+                            fontSize: 16,
+                          }}
+                        >
+                          Play
+                        </Text>
+                      </PressScale>
+
+                      {/* DETAILS */}
+
+                      <PressScale
+
+                        onPress={() =>
+                          navigation.navigate(
+                            'MovieDetail',
+                            {
+                              movie,
+                            }
+                          )
+                        }
+
+                        style={{
+                          backgroundColor:
+                            'rgba(255,255,255,0.14)',
+
+                          flexDirection: 'row',
+
+                          alignItems: 'center',
+
+                          justifyContent: 'center',
+
+                          paddingHorizontal: 24,
+
+                          height: 54,
+
+                          borderRadius: 28,
+
+                          borderWidth: 1,
+
+                          borderColor:
+                            'rgba(255,255,255,0.16)',
+                        }}
+                      >
+                        <Ionicons
+                          name="information-circle-outline"
+
+                          size={22}
+
+                          color="#FFFFFF"
+                        />
+
+                        <Text
+                          style={{
+                            color: '#FFFFFF',
+
+                            marginLeft: 8,
+
+                            fontWeight: '600',
+
+                            fontSize: 16,
+                          }}
+                        >
+                          Details
+                        </Text>
+                      </PressScale>
+                    </View>
+
+                    {/* INDICATORS */}
+
+                    <View
+                      style={{
+                        flexDirection: 'row',
+
+                        justifyContent: 'center',
+
+                        marginTop: 26,
+                      }}
+                    >
+                      {movies.map(
+                        (_: any, dotIndex: number) => (
+
+                          <View
+                            key={dotIndex}
+
+                            style={{
+                              width:
+                                currentIndex === dotIndex
+                                  ? 24
+                                  : 7,
+
+                              height: 7,
+
+                              borderRadius: 4,
+
+                              backgroundColor:
+                                currentIndex === dotIndex
+                                  ? '#4DA2FF'
+                                  : 'rgba(255,255,255,0.32)',
+
+                              marginHorizontal: 4,
+                            }}
+                          />
+                        )
+                      )}
+                    </View>
+                  </Animated.View>
+                </LinearGradient>
+              </ImageBackground>
+            </Animated.View>
+          )
+        )}
+      </ScrollView>
+    </>
   );
 }
 

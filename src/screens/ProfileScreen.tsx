@@ -19,6 +19,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { useNavigation } from '@react-navigation/native';
 
+import * as ImagePicker
+from 'expo-image-picker';
+
 import {
   useTheme,
 } from '../context/ThemeContext';
@@ -28,7 +31,6 @@ import {
 } from '../services/auth';
 
 import {
-  PROFILE_AVATARS,
   getAvatarUri,
   getFirstName,
 } from '../services/session';
@@ -57,11 +59,6 @@ const menuItems = [
   },
 
   {
-    icon: 'language-outline',
-    title: 'Language',
-  },
-
-  {
     icon: 'settings-outline',
     title: 'Settings',
   },
@@ -74,7 +71,8 @@ const menuItems = [
 
 export default function ProfileScreen() {
 
-  const navigation: any = useNavigation();
+  const navigation: any =
+    useNavigation();
 
   const {
     darkMode,
@@ -108,21 +106,21 @@ export default function ProfileScreen() {
   ] = useState(user.name);
 
   const [
-    draftAvatarId,
-    setDraftAvatarId,
-  ] = useState(user.avatarId);
+    profileImage,
+    setProfileImage,
+  ] = useState(
+    user.avatarId
+      ? getAvatarUri(
+          user.avatarId
+        )
+      : ''
+  );
 
   useEffect(() => {
 
     setDraftName(user.name);
 
-    setDraftAvatarId(
-      user.avatarId
-    );
-  }, [
-    user.avatarId,
-    user.name,
-  ]);
+  }, [user.name]);
 
   const stats =
     useMemo(() => {
@@ -130,26 +128,39 @@ export default function ProfileScreen() {
       const readyOffline =
         downloads.filter(
           (item) =>
-            item.status === 'completed'
+            item.status ===
+            'completed'
         ).length;
 
       return [
         {
-          label: 'Watchlist',
+          label:
+            'Watchlist',
+
           value:
-            String(watchlist.length),
+            String(
+              watchlist.length
+            ),
         },
 
         {
-          label: 'Downloads',
+          label:
+            'Downloads',
+
           value:
-            String(downloads.length),
+            String(
+              downloads.length
+            ),
         },
 
         {
-          label: 'Ready',
+          label:
+            'Ready',
+
           value:
-            String(readyOffline),
+            String(
+              readyOffline
+            ),
         },
       ];
 
@@ -158,26 +169,76 @@ export default function ProfileScreen() {
       watchlist.length,
     ]);
 
-  const hasProfileChanges =
-    draftName.trim() !==
-      user.name ||
-    draftAvatarId !==
-      user.avatarId;
+  async function
+  pickProfileImage() {
 
-  async function saveProfile() {
+    try {
+
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (
+        !permission.granted
+      ) {
+        return;
+      }
+
+      const result =
+        await ImagePicker.launchImageLibraryAsync({
+
+          mediaTypes:
+            ImagePicker.MediaTypeOptions.Images,
+
+          allowsEditing:
+            true,
+
+          aspect: [1, 1],
+
+          quality: 0.8,
+        });
+
+      if (
+        result.canceled
+      ) {
+        return;
+      }
+
+      const imageUri =
+        result.assets?.[0]
+          ?.uri;
+
+      if (!imageUri) {
+        return;
+      }
+
+      setProfileImage(
+        imageUri
+      );
+
+    } catch (error) {
+
+      console.log(error);
+    }
+  }
+
+  async function
+  saveProfile() {
 
     await updateUser({
       name: draftName,
-      avatarId: draftAvatarId,
+      avatarId:
+    user.avatarId,
     });
   }
 
-  async function handleSignOut() {
+  async function
+  handleSignOut() {
 
     await logout();
 
     navigation.reset({
       index: 0,
+
       routes: [
         {
           name: 'Login',
@@ -191,84 +252,161 @@ export default function ProfileScreen() {
       style={{
         flex: 1,
 
-        backgroundColor: colors.background,
+        backgroundColor:
+          colors.background,
       }}
     >
       <ScrollView
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={
+          false
+        }
 
         contentContainerStyle={{
           paddingBottom: 120,
         }}
       >
+
         {/* HEADER */}
 
         <View
           style={{
-            alignItems: 'center',
-            marginTop: 25,
+            alignItems:
+              'center',
+
+            marginTop: 30,
           }}
         >
-          <Image
-            source={{
-              uri: getAvatarUri(
-                draftAvatarId
-              ),
-            }}
 
-            style={{
-              width: 110,
-              height: 110,
+          <View>
 
-              borderRadius: 55,
+            <Image
+              source={{
+                uri:
+                  profileImage ||
+                  getAvatarUri(
+                    user.avatarId
+                  ),
+              }}
 
-              borderWidth: 3,
-              borderColor: colors.accent,
-            }}
-          />
+              style={{
+                width: 120,
+                height: 120,
+
+                borderRadius:
+                  60,
+
+                borderWidth: 3,
+
+                borderColor:
+                  colors.accent,
+              }}
+            />
+
+            <TouchableOpacity
+
+              onPress={
+                pickProfileImage
+              }
+
+              style={{
+                position:
+                  'absolute',
+
+                bottom: 0,
+                right: 0,
+
+                width: 38,
+                height: 38,
+
+                borderRadius:
+                  19,
+
+                backgroundColor:
+                  colors.accent,
+
+                justifyContent:
+                  'center',
+
+                alignItems:
+                  'center',
+              }}
+            >
+              <Ionicons
+                name="camera"
+
+                size={20}
+
+                color={
+                  colors.onAccent
+                }
+              />
+            </TouchableOpacity>
+
+          </View>
 
           <Text
             style={{
-              color: colors.textPrimary,
+              color:
+                colors.textPrimary,
 
-              fontSize: 28,
-              fontWeight: 'bold',
+              fontSize: 30,
 
-              marginTop: 18,
+              fontWeight:
+                'bold',
+
+              marginTop: 20,
             }}
           >
             {getFirstName(
-              user.name
+              draftName
             )}
           </Text>
 
           <Text
             style={{
-              color: colors.textSecondary,
-              marginTop: 5,
+              color:
+                colors.textSecondary,
+
+              marginTop: 6,
+
+              fontSize: 15,
             }}
           >
-            Local session active
+            Premium member
           </Text>
         </View>
 
+        {/* PROFILE CARD */}
+
         <View
           style={{
-            marginTop: 28,
-            marginHorizontal: 20,
-            padding: 18,
-            borderRadius: 8,
-            backgroundColor: colors.surface,
+            marginTop: 30,
+
+            marginHorizontal:
+              20,
+
+            backgroundColor:
+              colors.surface,
+
+            borderRadius: 26,
+
+            padding: 20,
+
             borderWidth: 1,
+
             borderColor:
               colors.borderSubtle,
           }}
         >
           <Text
             style={{
-              color: colors.textPrimary,
-              fontSize: 18,
-              fontWeight: '800',
+              color:
+                colors.textPrimary,
+
+              fontSize: 20,
+
+              fontWeight:
+                '800',
             }}
           >
             Profile Identity
@@ -276,100 +414,74 @@ export default function ProfileScreen() {
 
           <TextInput
             value={draftName}
-            onChangeText={setDraftName}
+
+            onChangeText={
+              setDraftName
+            }
+
             placeholder="Your name"
+
             placeholderTextColor={
               colors.textSecondary
             }
+
             style={{
-              color: colors.textPrimary,
-              marginTop: 16,
-              paddingHorizontal: 14,
-              paddingVertical: 12,
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor:
-                colors.borderSubtle,
+              marginTop: 18,
+
               backgroundColor:
                 colors.surfaceMuted,
+
+              borderRadius: 18,
+
+              paddingHorizontal:
+                18,
+
+              paddingVertical:
+                16,
+
+              color:
+                colors.textPrimary,
+
               fontSize: 16,
-              fontWeight: '600',
+
+              fontWeight:
+                '600',
             }}
           />
 
-          <View
-            style={{
-              flexDirection: 'row',
-              marginTop: 16,
-            }}
-          >
-            {PROFILE_AVATARS.map(
-              (avatar) => {
-
-                const selected =
-                  avatar.id ===
-                  draftAvatarId;
-
-                return (
-                  <TouchableOpacity
-                    key={avatar.id}
-                    onPress={() =>
-                      setDraftAvatarId(
-                        avatar.id
-                      )
-                    }
-                    style={{
-                      marginRight: 12,
-                      borderRadius: 28,
-                      borderWidth:
-                        selected ? 2 : 1,
-                      borderColor:
-                        selected
-                          ? colors.accent
-                          : colors.borderSubtle,
-                      padding: 2,
-                    }}
-                  >
-                    <Image
-                      source={{
-                        uri: avatar.uri,
-                      }}
-                      style={{
-                        width: 50,
-                        height: 50,
-                        borderRadius: 25,
-                      }}
-                    />
-                  </TouchableOpacity>
-                );
-              }
-            )}
-          </View>
-
           <TouchableOpacity
-            onPress={saveProfile}
-            disabled={!hasProfileChanges}
+
+            onPress={
+              saveProfile
+            }
+
             style={{
-              marginTop: 18,
-              paddingVertical: 14,
-              borderRadius: 8,
-              alignItems: 'center',
+              marginTop: 20,
+
               backgroundColor:
-                hasProfileChanges
-                  ? colors.accent
-                  : colors.surfaceMuted,
+                colors.accent,
+
+              paddingVertical:
+                16,
+
+              borderRadius: 18,
+
+              alignItems:
+                'center',
             }}
           >
             <Text
               style={{
                 color:
-                  hasProfileChanges
-                    ? colors.onAccent
-                    : colors.textSecondary,
-                fontWeight: '800',
+                  colors.onAccent,
+
+                fontWeight:
+                  '800',
+
+                fontSize: 16,
               }}
             >
-              Save Identity
+              Save Profile
             </Text>
           </TouchableOpacity>
         </View>
@@ -378,56 +490,78 @@ export default function ProfileScreen() {
 
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+            flexDirection:
+              'row',
 
-            marginTop: 35,
-            marginHorizontal: 20,
+            justifyContent:
+              'space-between',
+
+            marginTop: 34,
+
+            marginHorizontal:
+              20,
           }}
         >
-          {stats.map((item, index) => (
-            <View
-              key={index}
+          {stats.map(
+            (
+              item,
+              index
+            ) => (
 
-              style={{
-                flex: 1,
+              <View
+                key={index}
 
-                backgroundColor: colors.surface,
-
-                marginHorizontal: 6,
-
-                paddingVertical: 20,
-
-                borderRadius: 22,
-
-                alignItems: 'center',
-
-                borderWidth: 1,
-
-                borderColor: colors.borderSubtle,
-              }}
-            >
-              <Text
                 style={{
-                  color: colors.textPrimary,
+                  flex: 1,
 
-                  fontSize: 22,
-                  fontWeight: 'bold',
+                  marginHorizontal:
+                    5,
+
+                  backgroundColor:
+                    colors.surface,
+
+                  borderRadius:
+                    24,
+
+                  paddingVertical:
+                    22,
+
+                  alignItems:
+                    'center',
+
+                  borderWidth: 1,
+
+                  borderColor:
+                    colors.borderSubtle,
                 }}
               >
-                {item.value}
-              </Text>
+                <Text
+                  style={{
+                    color:
+                      colors.textPrimary,
 
-              <Text
-                style={{
-                  color: colors.textSecondary,
-                  marginTop: 6,
-                }}
-              >
-                {item.label}
-              </Text>
-            </View>
-          ))}
+                    fontSize: 26,
+
+                    fontWeight:
+                      'bold',
+                  }}
+                >
+                  {item.value}
+                </Text>
+
+                <Text
+                  style={{
+                    color:
+                      colors.textSecondary,
+
+                    marginTop: 6,
+                  }}
+                >
+                  {item.label}
+                </Text>
+              </View>
+            )
+          )}
         </View>
 
         {/* MENU */}
@@ -435,38 +569,53 @@ export default function ProfileScreen() {
         <View
           style={{
             marginTop: 40,
-            paddingHorizontal: 20,
+
+            paddingHorizontal:
+              20,
           }}
         >
 
-          {/* THEME TOGGLE */}
+          {/* THEME */}
 
           <TouchableOpacity
 
-            onPress={toggleTheme}
+            onPress={
+              toggleTheme
+            }
 
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              flexDirection:
+                'row',
 
-              backgroundColor: colors.surface,
+              alignItems:
+                'center',
+
+              justifyContent:
+                'space-between',
+
+              backgroundColor:
+                colors.surface,
+
+              borderRadius:
+                22,
 
               padding: 18,
-
-              borderRadius: 22,
 
               marginBottom: 16,
 
               borderWidth: 1,
 
-              borderColor: colors.borderSubtle,
+              borderColor:
+                colors.borderSubtle,
             }}
           >
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
+                flexDirection:
+                  'row',
+
+                alignItems:
+                  'center',
               }}
             >
               <Ionicons
@@ -478,17 +627,22 @@ export default function ProfileScreen() {
 
                 size={24}
 
-                color={colors.accent}
+                color={
+                  colors.accent
+                }
               />
 
               <Text
                 style={{
-                  color: colors.textPrimary,
+                  color:
+                    colors.textPrimary,
 
                   marginLeft: 16,
 
                   fontSize: 16,
-                  fontWeight: '500',
+
+                  fontWeight:
+                    '600',
                 }}
               >
                 {darkMode
@@ -499,101 +653,150 @@ export default function ProfileScreen() {
 
             <Ionicons
               name="swap-horizontal"
+
               size={22}
-              color={colors.textSecondary}
+
+              color={
+                colors.textSecondary
+              }
             />
           </TouchableOpacity>
 
-          {/* MENU ITEMS */}
+          {menuItems.map(
+            (
+              item,
+              index
+            ) => (
 
-          {menuItems.map((item, index) => (
+              <TouchableOpacity
 
-            <TouchableOpacity
+                key={index}
 
-              key={index}
+                onPress={() => {
 
-              onPress={() => {
+                  if (
+                    item.title ===
+                    'Watchlist'
+                  ) {
 
-                if (item.title === 'Watchlist') {
+                    navigation.navigate(
+                      'Watchlist'
+                    );
+                  }
 
-                  navigation.navigate('Watchlist');
-                }
+                  if (
+                    item.title ===
+                    'Downloads'
+                  ) {
 
-                if (item.title === 'Downloads') {
+                    navigation.navigate(
+                      'Downloads'
+                    );
+                  }
+                }}
 
-                  navigation.navigate('Downloads');
-                }
-              }}
-
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-
-                backgroundColor: colors.surface,
-
-                padding: 18,
-
-                borderRadius: 22,
-
-                marginBottom: 16,
-
-                borderWidth: 1,
-
-                borderColor: colors.borderSubtle,
-              }}
-            >
-              <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  flexDirection:
+                    'row',
+
+                  alignItems:
+                    'center',
+
+                  justifyContent:
+                    'space-between',
+
+                  backgroundColor:
+                    colors.surface,
+
+                  borderRadius:
+                    22,
+
+                  padding: 18,
+
+                  marginBottom: 16,
+
+                  borderWidth: 1,
+
+                  borderColor:
+                    colors.borderSubtle,
                 }}
               >
-                <Ionicons
-                  name={item.icon as any}
-                  size={24}
-                  color={colors.accent}
-                />
-
-                <Text
+                <View
                   style={{
-                    color: colors.textPrimary,
+                    flexDirection:
+                      'row',
 
-                    marginLeft: 16,
-
-                    fontSize: 16,
-                    fontWeight: '500',
+                    alignItems:
+                      'center',
                   }}
                 >
-                  {item.title}
-                </Text>
-              </View>
+                  <Ionicons
+                    name={
+                      item.icon as any
+                    }
 
-              <Ionicons
-                name="chevron-forward"
-                size={22}
-                color={colors.textSecondary}
-              />
-            </TouchableOpacity>
+                    size={24}
 
-          ))}
+                    color={
+                      colors.accent
+                    }
+                  />
+
+                  <Text
+                    style={{
+                      color:
+                        colors.textPrimary,
+
+                      marginLeft: 16,
+
+                      fontSize: 16,
+
+                      fontWeight:
+                        '600',
+                    }}
+                  >
+                    {item.title}
+                  </Text>
+                </View>
+
+                <Ionicons
+                  name="chevron-forward"
+
+                  size={22}
+
+                  color={
+                    colors.textSecondary
+                  }
+                />
+              </TouchableOpacity>
+            )
+          )}
+
+          {/* SIGN OUT */}
 
           <TouchableOpacity
-            onPress={handleSignOut}
+
+            onPress={
+              handleSignOut
+            }
+
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+              flexDirection:
+                'row',
+
+              alignItems:
+                'center',
+
               justifyContent:
                 'space-between',
 
               backgroundColor:
                 'rgba(255,77,109,0.12)',
 
+              borderRadius:
+                22,
+
               padding: 18,
-
-              borderRadius: 22,
-
-              marginBottom: 16,
 
               borderWidth: 1,
 
@@ -603,24 +806,32 @@ export default function ProfileScreen() {
           >
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
+                flexDirection:
+                  'row',
+
+                alignItems:
+                  'center',
               }}
             >
               <Ionicons
                 name="log-out-outline"
+
                 size={24}
+
                 color="#FF6B8A"
               />
 
               <Text
                 style={{
-                  color: '#FFB3C1',
+                  color:
+                    '#FFB3C1',
 
                   marginLeft: 16,
 
                   fontSize: 16,
-                  fontWeight: '700',
+
+                  fontWeight:
+                    '700',
                 }}
               >
                 Sign Out
@@ -629,10 +840,13 @@ export default function ProfileScreen() {
 
             <Ionicons
               name="chevron-forward"
+
               size={22}
+
               color="#FFB3C1"
             />
           </TouchableOpacity>
+
         </View>
       </ScrollView>
     </SafeAreaView>
