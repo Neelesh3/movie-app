@@ -1,5 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import {
+  getUserScopedKey,
+} from './session';
+
 const CONTINUE_KEY =
   'cinebluish_continue';
 
@@ -7,7 +11,13 @@ export async function getContinueWatching() {
 
   try {
 
+    const key =
+      await getUserScopedKey(
+        CONTINUE_KEY
+      );
+
     const data =
+      await AsyncStorage.getItem(key) ||
       await AsyncStorage.getItem(
         CONTINUE_KEY
       );
@@ -42,8 +52,13 @@ export async function saveContinueWatching(
       ...filtered,
     ];
 
+    const key =
+      await getUserScopedKey(
+        CONTINUE_KEY
+      );
+
     await AsyncStorage.setItem(
-      CONTINUE_KEY,
+      key,
       JSON.stringify(updated)
     );
 

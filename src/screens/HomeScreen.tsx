@@ -52,6 +52,15 @@ import {
 
 import TopTenRow from '../components/TopTenRow';
 
+import {
+  getAvatarUri,
+  getFirstName,
+} from '../services/session';
+
+import {
+  useSessionStore,
+} from '../stores/sessionStore';
+
 const categoryFilters = [
   'Movies',
   'Trending',
@@ -67,6 +76,14 @@ export default function HomeScreen() {
     darkMode,
     colors,
   } = useTheme();
+
+  const user =
+    useSessionStore(
+      (state) => state.user
+    );
+
+  const firstName =
+    getFirstName(user.name);
 
   const [
     trendingMovies,
@@ -336,7 +353,9 @@ export default function HomeScreen() {
           {recommendedMovies.length > 0 && (
 
             <MovieRow
-              title="Recommended For You"
+              title={
+                `Recommended for ${firstName}`
+              }
               movies={
                 recommendedMovies
               }
@@ -384,6 +403,7 @@ export default function HomeScreen() {
       loading,
       popularMovies,
       recommendedMovies,
+      firstName,
       topRatedMovies,
       trendingMovies,
       upcomingMovies,
@@ -494,7 +514,9 @@ export default function HomeScreen() {
             <Image
               source={{
                 uri:
-                  'https://i.pravatar.cc/150?img=12',
+                  getAvatarUri(
+                    user.avatarId
+                  ),
               }}
 
               style={{
@@ -527,7 +549,7 @@ export default function HomeScreen() {
               fontSize: 16,
             }}
           >
-            Good Evening 👋
+            Good evening, {firstName}
           </Text>
 
           <Text

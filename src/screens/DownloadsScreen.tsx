@@ -26,9 +26,17 @@ import {
 } from '../context/ThemeContext';
 
 import {
+  getFirstName,
+} from '../services/session';
+
+import {
   DownloadItem,
   useDownloadStore,
 } from '../stores/downloadStore';
+
+import {
+  useSessionStore,
+} from '../stores/sessionStore';
 
 function getStatusLabel(
   item: DownloadItem
@@ -49,6 +57,14 @@ export default function DownloadsScreen() {
 
   const { colors } =
     useTheme();
+
+  const user =
+    useSessionStore(
+      (state) => state.user
+    );
+
+  const firstName =
+    getFirstName(user.name);
 
   const downloads =
     useDownloadStore(
@@ -304,7 +320,7 @@ export default function DownloadsScreen() {
                   fontWeight: '900',
                 }}
               >
-                Downloads
+                {firstName}'s Downloads
               </Text>
 
               <Text
@@ -313,7 +329,7 @@ export default function DownloadsScreen() {
                   marginTop: 6,
                 }}
               >
-                Your offline CineBluish vault
+                Offline titles saved to this session
               </Text>
 
               <View
@@ -430,7 +446,7 @@ export default function DownloadsScreen() {
                 textAlign: 'center',
               }}
             >
-              Add movies or series to make them available in your offline library.
+              Add movies or series to make them available in {firstName}'s offline library.
             </Text>
           </View>
         )}

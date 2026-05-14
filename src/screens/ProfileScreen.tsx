@@ -1,4 +1,8 @@
-import React from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import {
   View,
@@ -6,6 +10,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,6 +22,24 @@ import { useNavigation } from '@react-navigation/native';
 import {
   useTheme,
 } from '../context/ThemeContext';
+
+import {
+  PROFILE_AVATARS,
+  getAvatarUri,
+  getFirstName,
+} from '../services/session';
+
+import {
+  useSessionStore,
+} from '../stores/sessionStore';
+
+import {
+  useDownloadStore,
+} from '../stores/downloadStore';
+
+import {
+  useWatchlistStore,
+} from '../stores/watchlistStore';
 
 const menuItems = [
   {
@@ -55,6 +78,96 @@ export default function ProfileScreen() {
     colors,
   } = useTheme();
 
+  const user =
+    useSessionStore(
+      (state) => state.user
+    );
+
+  const updateUser =
+    useSessionStore(
+      (state) => state.updateUser
+    );
+
+  const downloads =
+    useDownloadStore(
+      (state) => state.items
+    );
+
+  const watchlist =
+    useWatchlistStore(
+      (state) => state.items
+    );
+
+  const [
+    draftName,
+    setDraftName,
+  ] = useState(user.name);
+
+  const [
+    draftAvatarId,
+    setDraftAvatarId,
+  ] = useState(user.avatarId);
+
+  useEffect(() => {
+
+    setDraftName(user.name);
+
+    setDraftAvatarId(
+      user.avatarId
+    );
+  }, [
+    user.avatarId,
+    user.name,
+  ]);
+
+  const stats =
+    useMemo(() => {
+
+      const readyOffline =
+        downloads.filter(
+          (item) =>
+            item.status === 'completed'
+        ).length;
+
+      return [
+        {
+          label: 'Watchlist',
+          value:
+            String(watchlist.length),
+        },
+
+        {
+          label: 'Downloads',
+          value:
+            String(downloads.length),
+        },
+
+        {
+          label: 'Ready',
+          value:
+            String(readyOffline),
+        },
+      ];
+
+    }, [
+      downloads,
+      watchlist.length,
+    ]);
+
+  const hasProfileChanges =
+    draftName.trim() !==
+      user.name ||
+    draftAvatarId !==
+      user.avatarId;
+
+  async function saveProfile() {
+
+    await updateUser({
+      name: draftName,
+      avatarId: draftAvatarId,
+    });
+  }
+
   return (
     <SafeAreaView
       style={{
@@ -80,7 +193,9 @@ export default function ProfileScreen() {
         >
           <Image
             source={{
-              uri: 'https://i.pravatar.cc/300?img=12',
+              uri: getAvatarUri(
+                draftAvatarId
+              ),
             }}
 
             style={{
@@ -104,7 +219,9 @@ export default function ProfileScreen() {
               marginTop: 18,
             }}
           >
-            Neelesh
+            {getFirstName(
+              user.name
+            )}
           </Text>
 
           <Text
@@ -113,8 +230,130 @@ export default function ProfileScreen() {
               marginTop: 5,
             }}
           >
-            Premium Member
+            Local session active
           </Text>
+        </View>
+
+        <View
+          style={{
+            marginTop: 28,
+            marginHorizontal: 20,
+            padding: 18,
+            borderRadius: 8,
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor:
+              colors.borderSubtle,
+          }}
+        >
+          <Text
+            style={{
+              color: colors.textPrimary,
+              fontSize: 18,
+              fontWeight: '800',
+            }}
+          >
+            Profile Identity
+          </Text>
+
+          <TextInput
+            value={draftName}
+            onChangeText={setDraftName}
+            placeholder="Your name"
+            placeholderTextColor={
+              colors.textSecondary
+            }
+            style={{
+              color: colors.textPrimary,
+              marginTop: 16,
+              paddingHorizontal: 14,
+              paddingVertical: 12,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor:
+                colors.borderSubtle,
+              backgroundColor:
+                colors.surfaceMuted,
+              fontSize: 16,
+              fontWeight: '600',
+            }}
+          />
+
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop: 16,
+            }}
+          >
+            {PROFILE_AVATARS.map(
+              (avatar) => {
+
+                const selected =
+                  avatar.id ===
+                  draftAvatarId;
+
+                return (
+                  <TouchableOpacity
+                    key={avatar.id}
+                    onPress={() =>
+                      setDraftAvatarId(
+                        avatar.id
+                      )
+                    }
+                    style={{
+                      marginRight: 12,
+                      borderRadius: 28,
+                      borderWidth:
+                        selected ? 2 : 1,
+                      borderColor:
+                        selected
+                          ? colors.accent
+                          : colors.borderSubtle,
+                      padding: 2,
+                    }}
+                  >
+                    <Image
+                      source={{
+                        uri: avatar.uri,
+                      }}
+                      style={{
+                        width: 50,
+                        height: 50,
+                        borderRadius: 25,
+                      }}
+                    />
+                  </TouchableOpacity>
+                );
+              }
+            )}
+          </View>
+
+          <TouchableOpacity
+            onPress={saveProfile}
+            disabled={!hasProfileChanges}
+            style={{
+              marginTop: 18,
+              paddingVertical: 14,
+              borderRadius: 8,
+              alignItems: 'center',
+              backgroundColor:
+                hasProfileChanges
+                  ? colors.accent
+                  : colors.surfaceMuted,
+            }}
+          >
+            <Text
+              style={{
+                color:
+                  hasProfileChanges
+                    ? colors.onAccent
+                    : colors.textSecondary,
+                fontWeight: '800',
+              }}
+            >
+              Save Identity
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* STATS */}
@@ -128,22 +367,7 @@ export default function ProfileScreen() {
             marginHorizontal: 20,
           }}
         >
-          {[
-            {
-              label: 'Watch Time',
-              value: '248h',
-            },
-
-            {
-              label: 'Movies',
-              value: '96',
-            },
-
-            {
-              label: 'Series',
-              value: '18',
-            },
-          ].map((item, index) => (
+          {stats.map((item, index) => (
             <View
               key={index}
 
@@ -275,6 +499,11 @@ export default function ProfileScreen() {
                 if (item.title === 'Watchlist') {
 
                   navigation.navigate('Watchlist');
+                }
+
+                if (item.title === 'Downloads') {
+
+                  navigation.navigate('Downloads');
                 }
               }}
 

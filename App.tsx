@@ -46,6 +46,10 @@ import {
   useDownloadStore,
 } from './src/stores/downloadStore';
 
+import {
+  useSessionStore,
+} from './src/stores/sessionStore';
+
 function AppNavigationRoot() {
 
   const [
@@ -68,6 +72,10 @@ function AppNavigationRoot() {
 
       try {
 
+        await useSessionStore
+          .getState()
+          .hydrate();
+
         const [, , done] =
           await Promise.all([
             useWatchlistStore
@@ -89,6 +97,11 @@ function AppNavigationRoot() {
       } catch {
 
         if (!cancelled) {
+          await useSessionStore
+            .getState()
+            .hydrate()
+            .catch(() => {});
+
           await useWatchlistStore
             .getState()
             .hydrate()

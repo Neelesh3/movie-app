@@ -4,6 +4,10 @@ import {
   safeArray,
 } from '../api/request';
 
+import {
+  getUserScopedKey,
+} from './session';
+
 export const DOWNLOADS_KEY =
   'cinebluish_downloads';
 
@@ -11,7 +15,13 @@ export async function getStoredDownloads() {
 
   try {
 
+    const key =
+      await getUserScopedKey(
+        DOWNLOADS_KEY
+      );
+
     const data =
+      await AsyncStorage.getItem(key) ||
       await AsyncStorage.getItem(
         DOWNLOADS_KEY
       );
@@ -34,8 +44,13 @@ export async function saveStoredDownloads(
 
   try {
 
+    const key =
+      await getUserScopedKey(
+        DOWNLOADS_KEY
+      );
+
     await AsyncStorage.setItem(
-      DOWNLOADS_KEY,
+      key,
       JSON.stringify(
         safeArray(downloads)
       )

@@ -1,12 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import {
+  getUserScopedKey,
+} from './session';
+
 const WATCHLIST_KEY = 'cinebluish_watchlist';
 
 export async function getWatchlist() {
 
   try {
 
+    const key =
+      await getUserScopedKey(
+        WATCHLIST_KEY
+      );
+
     const data =
+      await AsyncStorage.getItem(key) ||
       await AsyncStorage.getItem(
         WATCHLIST_KEY
       );
@@ -67,8 +77,13 @@ export async function addToWatchlist(
       movie,
     ];
 
+    const key =
+      await getUserScopedKey(
+        WATCHLIST_KEY
+      );
+
     await AsyncStorage.setItem(
-      WATCHLIST_KEY,
+      key,
       JSON.stringify(updated)
     );
 
@@ -92,8 +107,13 @@ export async function removeFromWatchlist(
           item.id !== movieId
       );
 
+    const key =
+      await getUserScopedKey(
+        WATCHLIST_KEY
+      );
+
     await AsyncStorage.setItem(
-      WATCHLIST_KEY,
+      key,
       JSON.stringify(updated)
     );
 
