@@ -11,19 +11,34 @@ import * as FirebaseAuth from 'firebase/auth';
   getFirestore,
 } from 'firebase/firestore';
 
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_APP_ID,
+} from '@env';
+
 const firebaseConfig = {
-  apiKey: 'AIzaSyB7vVY82-jyYK6qmFaGiDcVVRHsh-vDc2o',
 
-  authDomain: "cinebluish.firebaseapp.com",
+  apiKey:
+    FIREBASE_API_KEY,
 
-  projectId: "cinebluish",
+  authDomain:
+    FIREBASE_AUTH_DOMAIN,
 
-  storageBucket: "cinebluish.firebasestorage.app",
+  projectId:
+    FIREBASE_PROJECT_ID,
+
+  storageBucket:
+    FIREBASE_STORAGE_BUCKET,
 
   messagingSenderId:
-    "490985825755",
+    FIREBASE_MESSAGING_SENDER_ID,
 
-  appId: "1:490985825755:web:0f28a42d83b8f4520033fe",
+  appId:
+    FIREBASE_APP_ID,
 };
 
 export const app =
