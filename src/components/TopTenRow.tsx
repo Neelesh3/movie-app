@@ -14,6 +14,8 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 
+import { useTheme } from '../context/ThemeContext';
+
 import FadeInImage from './FadeInImage';
 
 function TopTenRow({
@@ -22,6 +24,8 @@ function TopTenRow({
 
   const navigation: any =
     useNavigation();
+
+  const { colors } = useTheme();
 
   const topMovies =
     useMemo(
@@ -67,7 +71,7 @@ function TopTenRow({
 
         <Text
           style={{
-            color: '#FFFFFF',
+            color: colors.textPrimary,
 
             fontSize: 92,
 
@@ -77,7 +81,7 @@ function TopTenRow({
 
             zIndex: 2,
 
-            opacity: 0.9,
+            opacity: 0.85,
           }}
         >
           {index + 1}
@@ -108,20 +112,22 @@ function TopTenRow({
   return (
     <View
       style={{
-        marginTop: 35,
+        marginTop: 44,
       }}
     >
       <Text
         style={{
-          color: '#FFFFFF',
+          color: colors.textPrimary,
 
-          fontSize: 24,
+          fontSize: 18,
 
-          fontWeight: 'bold',
+          fontWeight: '800',
 
           paddingHorizontal: 20,
 
-          marginBottom: 20,
+          marginBottom: 22,
+
+          letterSpacing: 0.2,
         }}
       >
         Top 10 in CineBluish Today
@@ -148,7 +154,7 @@ function TopTenRow({
 
         contentContainerStyle={{
           paddingLeft: 20,
-          paddingRight: 10,
+          paddingRight: 20,
         }}
       />
     </View>

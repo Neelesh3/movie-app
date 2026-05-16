@@ -6,7 +6,12 @@ import {
   View,
   Text,
   FlatList,
+  Pressable,
 } from 'react-native';
+
+import {
+  useNavigation,
+} from '@react-navigation/native';
 
 import MovieCard from './MovieCard';
 
@@ -24,7 +29,11 @@ function MovieRow({
   movies,
 }: Props) {
 
-  const { colors } = useTheme();
+  const navigation: any =
+    useNavigation();
+
+  const { colors } =
+    useTheme();
 
   const keyExtractor =
     useCallback((
@@ -53,12 +62,24 @@ function MovieRow({
       <MovieCard movie={item} />
     ), []);
 
+  function handleSeeAll() {
+
+    navigation.navigate(
+      'CategoryMovies',
+      {
+        title,
+        movies,
+      }
+    );
+  }
+
   return (
     <View
       style={{
-        marginTop: 35,
+        marginTop: 44,
       }}
     >
+
       {/* HEADER */}
 
       <View
@@ -68,26 +89,36 @@ function MovieRow({
           alignItems: 'center',
 
           paddingHorizontal: 20,
-          marginBottom: 18,
+          marginBottom: 22,
         }}
       >
+
         <Text
           style={{
             color: colors.textPrimary,
-            fontSize: 24,
-            fontWeight: 'bold',
+            fontSize: 18,
+            fontWeight: '800',
+            letterSpacing: 0.2,
           }}
         >
           {title}
         </Text>
 
-        <Text
-          style={{
-            color: colors.accent,
-          }}
+        <Pressable
+          onPress={handleSeeAll}
         >
-          See All
-        </Text>
+          <Text
+            style={{
+              color: colors.accent,
+              fontSize: 12,
+              fontWeight: '700',
+              letterSpacing: 0.3,
+            }}
+          >
+            See All
+          </Text>
+        </Pressable>
+
       </View>
 
       {/* MOVIES */}
@@ -115,8 +146,10 @@ function MovieRow({
 
         contentContainerStyle={{
           paddingLeft: 20,
+          paddingRight: 20,
         }}
       />
+
     </View>
   );
 }

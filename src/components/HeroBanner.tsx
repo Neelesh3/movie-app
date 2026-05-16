@@ -237,9 +237,9 @@ function HeroBanner({
                 >
                   <Animated.View
                     style={{
-                      paddingHorizontal: 22,
+                      paddingHorizontal: 20,
 
-                      paddingBottom: 52,
+                      paddingBottom: 48,
 
                       opacity:
                         currentIndex === index
@@ -253,13 +253,15 @@ function HeroBanner({
                       style={{
                         color: '#FFFFFF',
 
-                        fontSize: 38,
+                        fontSize: 36,
 
-                        fontWeight: '800',
+                        fontWeight: '900',
 
-                        letterSpacing: 0.5,
+                        letterSpacing: 0.3,
 
-                        width: '68%',
+                        width: '70%',
+
+                        lineHeight: 42,
                       }}
                     >
                       {movie.title}
@@ -271,15 +273,17 @@ function HeroBanner({
                       numberOfLines={2}
 
                       style={{
-                        color: '#D6D6D6',
+                        color: '#D9D9D9',
 
-                        marginTop: 14,
+                        marginTop: 16,
 
-                        lineHeight: 24,
+                        lineHeight: 22,
 
-                        fontSize: 15,
+                        fontSize: 14,
 
-                        width: '72%',
+                        width: '75%',
+
+                        letterSpacing: 0.1,
                       }}
                     >
                       {movie.overview}
@@ -291,28 +295,37 @@ function HeroBanner({
                       style={{
                         flexDirection: 'row',
 
-                        marginTop: 18,
+                        marginTop: 20,
+
+                        gap: 8,
                       }}
                     >
                       <View
                         style={{
                           backgroundColor:
-                            'rgba(255,255,255,0.12)',
+                            'rgba(255,255,255,0.15)',
 
-                          paddingHorizontal: 14,
+                          paddingHorizontal: 12,
 
-                          paddingVertical: 8,
+                          paddingVertical: 7,
 
-                          borderRadius: 20,
+                          borderRadius: 18,
 
-                          marginRight: 10,
+                          borderWidth: 1,
+
+                          borderColor:
+                            'rgba(255,255,255,0.1)',
                         }}
                       >
                         <Text
                           style={{
                             color: '#FFFFFF',
 
-                            fontWeight: '600',
+                            fontWeight: '700',
+
+                            fontSize: 12,
+
+                            letterSpacing: 0.3,
                           }}
                         >
                           HD
@@ -322,20 +335,29 @@ function HeroBanner({
                       <View
                         style={{
                           backgroundColor:
-                            'rgba(255,255,255,0.12)',
+                            'rgba(255,255,255,0.15)',
 
-                          paddingHorizontal: 14,
+                          paddingHorizontal: 12,
 
-                          paddingVertical: 8,
+                          paddingVertical: 7,
 
-                          borderRadius: 20,
+                          borderRadius: 18,
+
+                          borderWidth: 1,
+
+                          borderColor:
+                            'rgba(255,255,255,0.1)',
                         }}
                       >
                         <Text
                           style={{
                             color: '#FFFFFF',
 
-                            fontWeight: '600',
+                            fontWeight: '700',
+
+                            fontSize: 12,
+
+                            letterSpacing: 0.3,
                           }}
                         >
                           IMDb {movie.vote_average?.toFixed(1)}
@@ -349,7 +371,9 @@ function HeroBanner({
                       style={{
                         flexDirection: 'row',
 
-                        marginTop: 22,
+                        marginTop: 24,
+
+                        gap: 12,
                       }}
                     >
                       {/* PLAY */}
@@ -375,19 +399,17 @@ function HeroBanner({
 
                           justifyContent: 'center',
 
-                          paddingHorizontal: 30,
+                          paddingHorizontal: 28,
 
-                          height: 54,
+                          height: 52,
 
-                          borderRadius: 28,
-
-                          marginRight: 14,
+                          borderRadius: 26,
                         }}
                       >
                         <Ionicons
                           name="play"
 
-                          size={22}
+                          size={20}
 
                           color="#000000"
                         />
@@ -396,11 +418,13 @@ function HeroBanner({
                           style={{
                             color: '#000000',
 
-                            marginLeft: 8,
+                            marginLeft: 10,
 
-                            fontWeight: '700',
+                            fontWeight: '800',
 
-                            fontSize: 16,
+                            fontSize: 15,
+
+                            letterSpacing: 0.2,
                           }}
                         >
                           Play
@@ -422,7 +446,7 @@ function HeroBanner({
 
                         style={{
                           backgroundColor:
-                            'rgba(255,255,255,0.14)',
+                            'rgba(255,255,255,0.12)',
 
                           flexDirection: 'row',
 
@@ -430,22 +454,22 @@ function HeroBanner({
 
                           justifyContent: 'center',
 
-                          paddingHorizontal: 24,
+                          paddingHorizontal: 22,
 
-                          height: 54,
+                          height: 52,
 
-                          borderRadius: 28,
+                          borderRadius: 26,
 
-                          borderWidth: 1,
+                          borderWidth: 1.5,
 
                           borderColor:
-                            'rgba(255,255,255,0.16)',
+                            'rgba(255,255,255,0.18)',
                         }}
                       >
                         <Ionicons
                           name="information-circle-outline"
 
-                          size={22}
+                          size={20}
 
                           color="#FFFFFF"
                         />
@@ -454,11 +478,13 @@ function HeroBanner({
                           style={{
                             color: '#FFFFFF',
 
-                            marginLeft: 8,
+                            marginLeft: 10,
 
-                            fontWeight: '600',
+                            fontWeight: '800',
 
-                            fontSize: 16,
+                            fontSize: 15,
+
+                            letterSpacing: 0.2,
                           }}
                         >
                           Details
@@ -474,7 +500,9 @@ function HeroBanner({
 
                         justifyContent: 'center',
 
-                        marginTop: 26,
+                        marginTop: 28,
+
+                        paddingBottom: 4,
                       }}
                     >
                       {movies.map(
@@ -486,19 +514,19 @@ function HeroBanner({
                             style={{
                               width:
                                 currentIndex === dotIndex
-                                  ? 24
-                                  : 7,
+                                  ? 26
+                                  : 6,
 
-                              height: 7,
+                              height: 6,
 
-                              borderRadius: 4,
+                              borderRadius: 3,
 
                               backgroundColor:
                                 currentIndex === dotIndex
                                   ? '#4DA2FF'
-                                  : 'rgba(255,255,255,0.32)',
+                                  : 'rgba(255,255,255,0.28)',
 
-                              marginHorizontal: 4,
+                              marginHorizontal: 5,
                             }}
                           />
                         )

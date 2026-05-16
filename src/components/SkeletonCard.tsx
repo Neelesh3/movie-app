@@ -9,17 +9,17 @@ export default function SkeletonCard() {
   return (
     <View
       style={{
-        marginRight: 16,
+        marginRight: 14,
       }}
     >
       {/* IMAGE */}
 
       <View
         style={{
-          width: 140,
-          height: 210,
+          width: 138,
+          height: 206,
 
-          borderRadius: 22,
+          borderRadius: 20,
 
           backgroundColor: '#1B2236',
         }}
@@ -29,14 +29,14 @@ export default function SkeletonCard() {
 
       <View
         style={{
-          width: 100,
-          height: 16,
+          width: 98,
+          height: 14,
 
           borderRadius: 10,
 
           backgroundColor: '#1B2236',
 
-          marginTop: 14,
+          marginTop: 12,
           marginLeft: 10,
         }}
       />

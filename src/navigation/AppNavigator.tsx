@@ -20,6 +20,7 @@ import WatchlistScreen from '../screens/WatchlistScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
+import CategoryMoviesScreen from '../screens/CategoryMoviesScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -192,6 +193,16 @@ export default function AppNavigator({
         component={WatchlistScreen}
         options={{
           animation: 'fade_from_bottom',
+
+          animationDuration: 340,
+        }}
+      />
+
+      <Stack.Screen
+        name="CategoryMovies"
+        component={CategoryMoviesScreen}
+        options={{
+          animation: 'slide_from_right',
 
           animationDuration: 340,
         }}

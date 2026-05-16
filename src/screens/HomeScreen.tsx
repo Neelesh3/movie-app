@@ -285,23 +285,37 @@ export default function HomeScreen() {
           style={{
             backgroundColor:
               index === 0
-                ? '#4DA2FF'
-                : 'rgba(255,255,255,0.08)',
+                ? colors.accent
+                : colors.surfaceMuted,
 
-            paddingHorizontal: 20,
+            paddingHorizontal: 18,
 
-            paddingVertical: 12,
+            paddingVertical: 10,
 
-            borderRadius: 28,
+            borderRadius: 26,
 
             marginRight: 12,
+
+            borderWidth: 1,
+
+            borderColor:
+              index === 0
+                ? colors.accent
+                : colors.borderSubtle,
           }}
         >
           <Text
             style={{
-              color: '#FFFFFF',
+              color:
+                index === 0
+                  ? colors.onAccent
+                  : colors.textPrimary,
 
               fontWeight: '600',
+
+              fontSize: 13,
+
+              letterSpacing: 0.2,
             }}
           >
             {item}
@@ -319,7 +333,7 @@ export default function HomeScreen() {
         return (
           <View
             style={{
-              marginTop: 35,
+              marginTop: 44,
 
               paddingLeft: 20,
             }}
@@ -461,7 +475,9 @@ export default function HomeScreen() {
 
             paddingHorizontal: 20,
 
-            paddingTop: 10,
+            paddingTop: 16,
+
+            paddingBottom: 12,
           }}
         >
           <View>
@@ -470,11 +486,11 @@ export default function HomeScreen() {
                 color:
                   colors.textPrimary,
 
-                fontSize: 30,
+                fontSize: 32,
 
-                fontWeight: 'bold',
+                fontWeight: '800',
 
-                letterSpacing: 1,
+                letterSpacing: 0.3,
               }}
             >
               CineBluish
@@ -485,7 +501,13 @@ export default function HomeScreen() {
                 color:
                   colors.textSecondary,
 
-                marginTop: 2,
+                marginTop: 6,
+
+                fontSize: 12,
+
+                fontWeight: '500',
+
+                letterSpacing: 0.2,
               }}
             >
               Stream without limits
@@ -536,9 +558,9 @@ export default function HomeScreen() {
           style={{
             paddingHorizontal: 20,
 
-            paddingTop: 20,
+            paddingTop: 28,
 
-            marginBottom: 10,
+            marginBottom: 24,
           }}
         >
           <Text
@@ -546,7 +568,11 @@ export default function HomeScreen() {
               color:
                 colors.textSecondary,
 
-              fontSize: 16,
+              fontSize: 14,
+
+              fontWeight: '500',
+
+              letterSpacing: 0.3,
             }}
           >
             Good evening, {firstName}
@@ -557,11 +583,13 @@ export default function HomeScreen() {
               color:
                 colors.textPrimary,
 
-              fontSize: 28,
+              fontSize: 26,
 
-              fontWeight: 'bold',
+              fontWeight: '700',
 
-              marginTop: 6,
+              marginTop: 8,
+
+              letterSpacing: 0.2,
             }}
           >
             Ready to stream tonight?
@@ -570,9 +598,11 @@ export default function HomeScreen() {
 
         {/* HERO */}
 
-        <HeroBanner
-          movies={heroMovies}
-        />
+        <View style={{ marginBottom: 4 }}>
+          <HeroBanner
+            movies={heroMovies}
+          />
+        </View>
 
         <ScrollView
           horizontal
@@ -582,7 +612,9 @@ export default function HomeScreen() {
           contentContainerStyle={{
             paddingHorizontal: 20,
 
-            marginTop: 24,
+            marginTop: 36,
+
+            marginBottom: 28,
           }}
         >
           {categoryFilterContent}

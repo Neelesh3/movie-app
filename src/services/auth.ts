@@ -7,9 +7,10 @@ import {
   type User,
 } from 'firebase/auth';
 
-import {
-  auth,
-} from '../config/firebase';
+
+import { auth } from '../config/firebase';
+
+
 
 export function listenToAuthState(
   callback: (user: User | null) => void
@@ -70,6 +71,20 @@ export function getAuthErrorMessage(
   error: any
 ) {
 
+  // Handle string errors from Google Sign-In
+  if (typeof error === 'string') {
+    if (
+      error.includes('cancelled') ||
+      error.includes('cancelled')
+    ) {
+      return 'Google sign-in was cancelled.';
+    }
+    if (error.includes('network')) {
+      return 'Network error. Check your connection and try again.';
+    }
+    return error;
+  }
+
   switch (error?.code) {
     case 'auth/email-already-in-use':
       return 'That email is already registered. Try logging in instead.';
@@ -89,7 +104,6 @@ export function getAuthErrorMessage(
       return 'Too many attempts. Wait a moment, then try again.';
     case 'auth/weak-password':
       return 'Use a password with at least 6 characters.';
-    default:
-      return 'Authentication failed. Please try again.';
+
   }
 }

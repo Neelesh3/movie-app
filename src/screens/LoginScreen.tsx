@@ -94,6 +94,7 @@ export default function LoginScreen() {
       useWatchlistStore
         .getState()
         .hydrate(),
+
       useDownloadStore
         .getState()
         .hydrate(),
@@ -121,17 +122,20 @@ export default function LoginScreen() {
         credential.user
       );
 
-      navigation.replace('MainTabs');
+      navigation.replace(
+        'MainTabs'
+      );
 
     } catch (authError) {
 
       setError(
         getAuthErrorMessage(
           authError
-        )
+        )|| ''
       );
 
     } finally {
+
       setLoading(false);
     }
   }
@@ -140,6 +144,7 @@ export default function LoginScreen() {
     <SafeAreaView
       style={{
         flex: 1,
+
         backgroundColor:
           colors.background,
       }}
@@ -154,7 +159,10 @@ export default function LoginScreen() {
             ? 'padding'
             : undefined
         }
-        style={{ flex: 1 }}
+
+        style={{
+          flex: 1,
+        }}
       >
         <LinearGradient
           colors={[
@@ -162,43 +170,65 @@ export default function LoginScreen() {
             '#0B1020',
             '#122447',
           ]}
+
           style={{
             flex: 1,
-            paddingHorizontal: 24,
-            justifyContent: 'center',
+
+            paddingHorizontal:
+              24,
+
+            justifyContent:
+              'center',
           }}
         >
+
           <View
             style={{
               marginBottom: 34,
             }}
           >
+
             <View
               style={{
                 width: 66,
                 height: 66,
+
                 borderRadius: 33,
-                alignItems: 'center',
-                justifyContent: 'center',
+
+                alignItems:
+                  'center',
+
+                justifyContent:
+                  'center',
+
                 backgroundColor:
                   'rgba(77,162,255,0.18)',
+
                 borderWidth: 1,
+
                 borderColor:
                   'rgba(77,162,255,0.38)',
               }}
             >
               <Ionicons
                 name="film"
+
                 size={30}
-                color={colors.accent}
+
+                color={
+                  colors.accent
+                }
               />
             </View>
 
             <Text
               style={{
                 color: '#FFFFFF',
+
                 fontSize: 34,
+
                 fontWeight: '900',
+
                 marginTop: 24,
               }}
             >
@@ -208,64 +238,107 @@ export default function LoginScreen() {
             <Text
               style={{
                 color: '#A8B3CF',
+
                 fontSize: 16,
+
                 lineHeight: 24,
+
                 marginTop: 10,
               }}
             >
               Sign in to restore your CineBluish profile, downloads, and recommendations.
             </Text>
+
           </View>
 
           <View>
+
             <TextInput
               value={email}
-              onChangeText={setEmail}
+
+              onChangeText={
+                setEmail
+              }
+
               autoCapitalize="none"
+
               autoCorrect={false}
+
               keyboardType="email-address"
+
               placeholder="Email"
+
               placeholderTextColor="#A8B3CF"
+
               style={{
                 color: '#FFFFFF',
+
                 backgroundColor:
                   'rgba(255,255,255,0.08)',
+
                 borderWidth: 1,
+
                 borderColor:
                   'rgba(255,255,255,0.12)',
+
                 borderRadius: 8,
-                paddingHorizontal: 16,
-                paddingVertical: 15,
+
+                paddingHorizontal:
+                  16,
+
+                paddingVertical:
+                  15,
+
                 fontSize: 16,
+
                 marginBottom: 14,
               }}
             />
 
             <TextInput
               value={password}
-              onChangeText={setPassword}
+
+              onChangeText={
+                setPassword
+              }
+
               placeholder="Password"
+
               placeholderTextColor="#A8B3CF"
+
               secureTextEntry
+
               style={{
                 color: '#FFFFFF',
+
                 backgroundColor:
                   'rgba(255,255,255,0.08)',
+
                 borderWidth: 1,
+
                 borderColor:
                   'rgba(255,255,255,0.12)',
+
                 borderRadius: 8,
-                paddingHorizontal: 16,
-                paddingVertical: 15,
+
+                paddingHorizontal:
+                  16,
+
+                paddingVertical:
+                  15,
+
                 fontSize: 16,
               }}
             />
 
             {!!error && (
+
               <Text
                 style={{
                   color: '#FF6B8A',
+
                   lineHeight: 20,
+
                   marginTop: 12,
                 }}
               >
@@ -274,26 +347,43 @@ export default function LoginScreen() {
             )}
 
             <PressScale
-              onPress={handleLogin}
-              disabled={!canSubmit}
+              onPress={
+                handleLogin
+              }
+
+              disabled={
+                !canSubmit
+              }
+
               style={{
                 backgroundColor:
                   colors.accent,
+
                 borderRadius: 50,
-                paddingVertical: 16,
-                alignItems: 'center',
+
+                paddingVertical:
+                  16,
+
+                alignItems:
+                  'center',
+
                 marginTop: 22,
               }}
             >
               {loading ? (
+
                 <ActivityIndicator
                   color="#FFFFFF"
                 />
+
               ) : (
+
                 <Text
                   style={{
                     color: '#FFFFFF',
+
                     fontSize: 17,
+
                     fontWeight: '800',
                   }}
                 >
@@ -308,21 +398,28 @@ export default function LoginScreen() {
                   'Signup'
                 )
               }
+
               style={{
-                alignItems: 'center',
-                paddingVertical: 18,
+                alignItems:
+                  'center',
+
+                paddingVertical:
+                  18,
               }}
             >
               <Text
                 style={{
                   color: '#A8B3CF',
+
                   fontWeight: '700',
                 }}
               >
                 New to CineBluish? Create an account
               </Text>
             </PressScale>
+
           </View>
+
         </LinearGradient>
       </KeyboardAvoidingView>
     </SafeAreaView>

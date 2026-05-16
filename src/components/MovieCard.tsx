@@ -56,15 +56,15 @@ function MovieCard({
     <PressScale
       onPress={handlePress}
       style={{
-        marginRight: 16,
-        width: 140,
+        marginRight: 14,
+        width: 138,
       }}
     >
       <View
         style={{
           backgroundColor: colors.surface,
 
-          borderRadius: 22,
+          borderRadius: 20,
 
           overflow: 'hidden',
 
@@ -83,13 +83,13 @@ function MovieCard({
 
           style={{
             width: '100%',
-            height: 210,
+            height: 206,
           }}
         />
 
         <View
           style={{
-            paddingVertical: 14,
+            paddingVertical: 12,
             paddingHorizontal: 10,
 
             alignItems: 'center',
@@ -100,9 +100,10 @@ function MovieCard({
 
             style={{
               color: colors.textPrimary,
-              fontSize: 15,
-              fontWeight: '600',
+              fontSize: 13,
+              fontWeight: '700',
               textAlign: 'center',
+              letterSpacing: 0.1,
             }}
           >
             {movie.title}
