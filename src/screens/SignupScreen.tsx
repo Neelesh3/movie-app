@@ -132,11 +132,11 @@ export default function SignupScreen() {
 
     } catch (authError) {
 
-      setError(
-        getAuthErrorMessage(
-          authError
-        )
-      );
+setError(
+  getAuthErrorMessage(
+    authError
+  ) || 'Authentication failed.'
+);
 
     } finally {
       setLoading(false);

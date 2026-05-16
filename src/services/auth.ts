@@ -10,6 +10,8 @@ import {
 
 import { auth } from '../config/firebase';
 
+import { useGoogleLogin } from './googleAuth';
+
 
 
 export function listenToAuthState(
@@ -107,3 +109,5 @@ export function getAuthErrorMessage(
 
   }
 }
+
+export { useGoogleLogin };

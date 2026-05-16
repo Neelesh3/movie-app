@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "490985825755",
+    "project_id": "cinebluish",
+    "storage_bucket": "cinebluish.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:490985825755:android:968d1450eed7456b0033fe",
+        "android_client_info": {
+          "package_name": "com.neelesh7.CineBluish"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "490985825755-dh5vd0mjfeu88utr1st0a2gsmndjpuld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.neelesh7.CineBluish",
+            "certificate_hash": "9f3e03e7b7e679e19d556b99f44bd25801535415"
+          }
+        },
+        {
+          "client_id": "490985825755-m7ulbrh4h4ivo54r2jt0bkatcs62r37o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMwsstada1DKyhsuA3NZq0e3dFLI7SXuU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "490985825755-hjssta890a0cvn47ortm3t7n538kpj5b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

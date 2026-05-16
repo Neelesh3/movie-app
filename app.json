@@ -2,6 +2,7 @@
   "expo": {
     "name": "CineBluish",
     "slug": "CineBluish",
+    "scheme": "cinebluish",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

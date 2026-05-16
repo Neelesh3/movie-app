@@ -31,6 +31,7 @@ import PressScale from '../components/PressScale';
 import {
   getAuthErrorMessage,
   loginWithEmail,
+  useGoogleLogin,
 } from '../services/auth';
 
 import {
@@ -77,10 +78,23 @@ export default function LoginScreen() {
     setLoading,
   ] = useState(false);
 
+  const [
+    googleLoading,
+    setGoogleLoading,
+  ] = useState(false);
+
   const canSubmit =
     email.trim().length > 0 &&
     password.length > 0 &&
     !loading;
+
+  const isAnyLoading =
+    loading || googleLoading;
+
+  const {
+    loginWithGoogle,
+    googleRequestReady,
+  } = useGoogleLogin();
 
   async function hydrateUserSession(
     authUser: any
@@ -131,12 +145,54 @@ export default function LoginScreen() {
       setError(
         getAuthErrorMessage(
           authError
-        )|| ''
+        ) || ''
       );
 
     } finally {
 
       setLoading(false);
+    }
+  }
+
+  async function handleGoogleLogin() {
+
+    console.log('[LoginScreen] Google button pressed');
+
+    setGoogleLoading(true);
+    setError('');
+
+    try {
+
+      console.log('[LoginScreen] Calling loginWithGoogle()...');
+
+      const user =
+        await loginWithGoogle();
+
+      console.log('[LoginScreen] Got user, hydrating session...');
+
+      await hydrateUserSession(
+        user
+      );
+
+      console.log('[LoginScreen] Navigating to MainTabs...');
+
+      navigation.replace(
+        'MainTabs'
+      );
+
+    } catch (authError) {
+
+      console.error('[LoginScreen] Google auth error:', authError);
+
+      setError(
+        getAuthErrorMessage(
+          authError
+        ) || String(authError)
+      );
+
+    } finally {
+
+      setGoogleLoading(false);
     }
   }
 
@@ -389,6 +445,83 @@ export default function LoginScreen() {
                 >
                   Log In
                 </Text>
+              )}
+            </PressScale>
+
+            <PressScale
+              onPress={
+                handleGoogleLogin
+              }
+
+              disabled={
+                isAnyLoading ||
+                !googleRequestReady
+              }
+
+              style={{
+                backgroundColor:
+                  'rgba(255,255,255,0.1)',
+
+                borderRadius: 50,
+
+                paddingVertical:
+                  16,
+
+                alignItems:
+                  'center',
+
+                marginTop: 12,
+
+                borderWidth: 1,
+
+                borderColor:
+                  'rgba(255,255,255,0.2)',
+              }}
+            >
+              {googleLoading ? (
+
+                <ActivityIndicator
+                  color="#FFFFFF"
+                />
+
+              ) : (
+
+                <View
+                  style={{
+                    flexDirection:
+                      'row',
+
+                    alignItems:
+                      'center',
+
+                    justifyContent:
+                      'center',
+                  }}
+                >
+                  <Ionicons
+                    name="logo-google"
+
+                    size={18}
+
+                    color="#FFFFFF"
+
+                    style={{
+                      marginRight: 8,
+                    }}
+                  />
+
+                  <Text
+                    style={{
+                      color: '#FFFFFF',
+
+                      fontSize: 17,
+
+                      fontWeight: '800',
+                    }}
+                  >
+                    Continue with Google
+                  </Text>
+                </View>
               )}
             </PressScale>
 
