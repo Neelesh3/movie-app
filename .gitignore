@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Firebase Android config (keep local, never commit)
+google-services.json
+android/app/google-services.json
